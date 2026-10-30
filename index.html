@@ -96,6 +96,13 @@
   .bb-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
   .bb-actions .ds-btn { font: 600 12.5px var(--mono); }
 
+  /* -- приватность: зеркало, а не проверка --------------------------------- */
+  .bb-privacy { display: flex; gap: 10px; align-items: flex-start; border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+    background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: var(--ds-radius-s);
+    padding: 10px 12px; margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+  .bb-privacy svg { flex: none; width: 15px; height: 15px; color: var(--accent); margin-top: 3px; }
+  .bb-privacy b { color: var(--text); }
+
   /* -- результат ------------------------------------------------------------ */
   .fx-res { margin-top: 4px; }
   .fx-verdict { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -105,6 +112,21 @@
   .fx-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
   .fx-stat { border: 1px solid var(--border); border-radius: var(--ds-radius-s); padding: 8px 10px; font-size: 12px; color: var(--muted); }
   .fx-stat b { display: block; font: 600 15px var(--mono); color: var(--text); margin-top: 2px; }
+
+  /* -- шкала итога: 0–100, выше — лучше (чтобы «меньше/больше» читалось) -- */
+  .fx-scalewrap { position: relative; max-width: 460px; margin: 14px 0 0; padding-top: 5px; }
+  .fx-scale { display: flex; height: 10px; border-radius: 99px; overflow: hidden; border: 1px solid var(--ds-border-strong); }
+  .fx-scale i { display: block; height: 100%; }
+  .fx-scale i.z1 { width: 50%; background: color-mix(in srgb, var(--red) 45%, transparent); }
+  .fx-scale i.z2 { width: 25%; background: color-mix(in srgb, var(--amber) 60%, transparent); }
+  .fx-scale i.z3 { width: 25%; background: color-mix(in srgb, var(--green) 45%, transparent); }
+  .fx-mark { position: absolute; top: 0; left: 0; width: 3px; height: 19px; margin-left: -1.5px;
+    background: var(--text); border-radius: 2px; box-shadow: 0 0 0 2px var(--bg); }
+  .fx-ticks { position: relative; height: 13px; margin-top: 3px; font: 500 10px var(--mono); color: var(--faint); }
+  .fx-ticks span { position: absolute; transform: translateX(-50%); }
+  .fx-ticks span:first-child { transform: none; }
+  .fx-ticks span:last-child { transform: translateX(-100%); }
+  .fx-scale-note { font: 11px var(--mono); color: var(--faint); margin: 3px 0 0; }
   .fx-warn { border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); background: color-mix(in srgb, var(--amber) 9%, transparent);
     border-radius: var(--ds-radius-s); padding: 10px 12px; font-size: 13px; color: var(--text); margin: 10px 0; }
   .fx-warn b { color: var(--amber); }
@@ -128,6 +150,13 @@
   .bb-bar i.s-bad { background: var(--red); }
   .bb-bar i.s-mid { background: var(--amber); }
   .bb-bar i.s-good { background: var(--green); }
+  .bb-lvcell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .bb-lvl { font: 600 10.5px var(--mono); padding: 1px 7px; border-radius: 99px; white-space: nowrap;
+    border: 1px solid var(--ds-border-strong); }
+  .bb-lvl.bad { color: var(--red); background: color-mix(in srgb, var(--red) 12%, transparent); }
+  .bb-lvl.mid { color: var(--amber); background: color-mix(in srgb, var(--amber) 16%, transparent); }
+  .bb-lvl.good { color: var(--green); background: color-mix(in srgb, var(--green) 12%, transparent); }
+  .bb-print-note { display: none; }
 
   .bb-top3 { margin: 14px 0 4px; }
   .bb-top3 h4 { margin: 0 0 8px; font: 600 13px var(--ds-font-sans); color: var(--text); }
@@ -163,10 +192,20 @@
   details.fx-method[open] > summary::before { transform: rotate(90deg); }
 
   /* -- печать: бланк результата --------------------------------------------- */
+  @page { margin: 12mm; }
   @media print {
-    .ds-hub, .bb-ctrl, .fx-actions, .theme-pill, .bb-actions, .sub, .bb-pack,
+    /* светофор обязан попадать в PDF: браузер по умолчанию выбрасывает фоны */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .ds-hub, .bb-ctrl, .fx-actions, .theme-pill, .bb-actions, .sub, .bb-pack, .bb-privacy,
     .ds-masthead__sub, .ds-masthead__side, .ds-masthead-meta, .ds-rule-double,
     #quiz, #method, #pick { display: none !important; }
+    .bb-print-note { display: block; font: 500 9.5px var(--mono); color: var(--ds-muted, #666); margin: 0 0 6px; }
+    .bb-lvl { border-style: solid; }
+    .fx-scalewrap { max-width: 400px; margin: 6px 0 0; padding-top: 4px; }
+    .fx-scale { height: 8px; }
+    .fx-mark { height: 16px; }
+    .fx-scale-note { font-size: 9px; margin-top: 2px; }
+    .bb-cats-tbl .bb-lvcell { gap: 6px; }
     body { font-size: 11.5px; }
     .ds-masthead { padding: 4px 0 6px; }
     .ds-masthead__logo svg { width: 18px; height: 18px; }
@@ -209,14 +248,14 @@
 
 <header class="ds-masthead">
   <div class="wrap">
-    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">скоро · v0.1</span></div>
+    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.2</span></div>
   </div>
   <div class="wrap ds-masthead__row">
     <div class="ds-masthead__brand">
       <div class="ds-masthead__logo"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <div>
         <h1 class="ds-masthead__title">БиоБарьер — скоринг биобезопасности хозяйства</h1>
-        <p class="ds-masthead__sub">Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит анкету и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Четыре пакета, включая первый в мире для мелких смешанных дворов. Считает в браузере — ответы не покидают устройство.</p>
+        <p class="ds-masthead__sub">Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит анкету и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Четыре пакета, включая первый в мире для мелких смешанных дворов. Считает в браузере — ответы не покидают устройство; это зеркало для хозяина, а не проверка.</p>
       </div>
     </div>
     <div class="ds-masthead__side">
@@ -244,6 +283,10 @@
   <section class="fx" id="quiz" hidden>
     <h2 id="quiz-title">Анкета</h2>
     <p class="sub" id="quiz-sub"></p>
+    <div class="bb-privacy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <p><b>Зеркало, а не проверка.</b> Ответы считаются и хранятся только в этом браузере: сервера нет, отправки нет, никто не увидит. Отвечайте «как есть» — низкий балл не признание, а план улучшения. Неохотный вопрос можно пропустить: пропуски не штрафуются, а просто выпадают из расчёта.</p>
+    </div>
     <div class="bb-ctrl">
       <div class="bb-mode" role="radiogroup" aria-label="Режим языка">
         <label><input type="radio" name="bb-mode" value="0" checked>владелец</label>
@@ -301,7 +344,7 @@
       </ul>
 
       <h2>План расширения</h2>
-      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. Дальше: рост каждого пакета до 60–80 вопросов (как у Biocheck), новые пакеты (откорм КРС, мелкие жвачные, перепела), и — если пойдёт сбор анонимных результатов — первый в мире русский бенчмарк, в том числе для ЛПХ.</p>
+      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами и подписями уровней, цвета светофора в печати PDF, тон анкеты без «казённого» языка. Дальше: рост каждого пакета до 60–80 вопросов (как у Biocheck), новые пакеты (откорм КРС, мелкие жвачные, перепела), и — если пойдёт сбор анонимных результатов — первый в мире русский бенчмарк, в том числе для ЛПХ.</p>
       </article>
     </details>
   </section>
@@ -310,7 +353,7 @@
 <footer class="ds-footer ds-footer--meta">
   <div class="wrap">
     <span class="legal">самооценка биобезопасности · не аудит и не ветеринарная консультация · бенчмарки — зарубежные публикации · <a href="./terms.html">условия и дисклеймер</a></span>
-    <span>v0.1 · подход — риск-ориентированный скоринг по мотивам Biocheck.UGent · арифметика гейтится известными ответами (node --test)</span>
+    <span>v0.2 · подход — риск-ориентированный скоринг по мотивам Biocheck.UGent · арифметика гейтится известными ответами (node --test)</span>
     <span>источники: <a href="https://www.biocheckgent.com/en/about-us/how-our-checklists-are-built">Biocheck.UGent</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7597688">бройлеры, Филиппины</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4359795">свиньи, Швеция</a> · <a href="https://link.springer.com/article/10.1186/s40813-018-0113-6">свиньи, Ирландия</a> · <a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815220300174">КРС</a> · ядро — <a href="https://github.com/shray77/vet-ds">vet-ds</a> · <a href="https://github.com/shray77/biobarrier-site">репозиторий</a></span>
   </div>
 </footer>
@@ -405,7 +448,7 @@
     var p = pack();
     if (!p) { $('quiz').hidden = true; return; }
     $('quiz-title').textContent = 'Анкета — ' + p.title;
-    $('quiz-sub').textContent = p.sub + '. Отвечайте, как есть на самом деле: анкета анонимна и остаётся в браузере. Пропущенные вопросы не учитываются — лучше ответить всё.';
+    $('quiz-sub').textContent = p.sub + '. Формулировки меняются переключателем ниже; пропуск не портит балл.';
     var groups = [
       { g: 'ext', label: 'Внешняя биобезопасность — барьеры от заноса' },
       { g: 'int', label: 'Внутренняя биобезопасность — барьеры внутри хозяйства' }
@@ -470,6 +513,17 @@
     });
   });
 
+  /* ---- печать всегда на белом: тёмная тема временно гаснет ---------------- */
+  var printTheme = null;
+  window.addEventListener('beforeprint', function () {
+    printTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    if (printTheme !== 'light') { document.documentElement.setAttribute('data-theme', 'light'); }
+  });
+  window.addEventListener('afterprint', function () {
+    if (printTheme && printTheme !== 'light') { document.documentElement.setAttribute('data-theme', printTheme); }
+    printTheme = null;
+  });
+
   $('btn-reset').addEventListener('click', function () {
     state.answers = {};
     persist();
@@ -525,9 +579,18 @@
     }
 
     var v = res.level;
+    h += '<div class="bb-print-note">БиоБарьер · ' + new Date().toLocaleDateString('ru-RU') + ' · распечатано для себя: данные не покидали браузер и никуда не отправлялись</div>';
     h += '<div class="fx-verdict"><span class="fx-big">' + res.total + '<small style="font-size:18px;color:var(--faint)">/100</small></span>'
        + '<span class="' + (LEVEL_CLS[v.code] || '') + '">' + v.label + '</span>'
        + '<span class="fx-ci">' + v.why + '</span></div>';
+
+    /* шкала с зонами: снимает путаницу «меньше/больше» — направление задано явно */
+    var markL = Math.max(0, Math.min(100, res.total));
+    h += '<div class="fx-scalewrap" aria-hidden="true">'
+       + '<div class="fx-scale"><i class="z1"></i><i class="z2"></i><i class="z3"></i></div>'
+       + '<b class="fx-mark" style="left:' + markL + '%"></b>'
+       + '<div class="fx-ticks"><span style="left:0">0</span><span style="left:50%">50</span><span style="left:75%">75</span><span style="left:100%">100</span></div></div>'
+       + '<p class="fx-scale-note">шкала итога 0–100: выше — лучше · критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75</p>';
 
     h += '<div class="fx-stats">'
        + '<div class="fx-stat">внешний (занос)<b>' + fmt(res.ext) + '</b></div>'
@@ -542,15 +605,17 @@
 
     h += benchBlock(p, res);
 
-    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>разрез по категориям · полоса — ваш скор внутри категории</caption>'
+    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>разрез по категориям · полоса и цифра — скор категории, выше — лучше · вес — вклад категории в итог (Σ = 100)</caption>'
        + '<thead><tr><th>категория</th><th>вес</th><th>скор</th><th style="width:38%">уровень</th></tr></thead><tbody>';
     res.cats.forEach(function (c) {
       var cat = CATS[c.id] || { t: [c.id, c.id] };
       var cls = c.score >= 75 ? 's-good' : (c.score >= 50 ? 's-mid' : 's-bad');
+      var lvl = c.score >= 75 ? ['good', 'крепко'] : (c.score >= 50 ? ['mid', 'есть дыры'] : ['bad', 'критично']);
       h += '<tr><td><b>' + esc(BB.text(cat.t, state.mode)) + '</b></td>'
          + '<td>' + c.w + '%</td>'
          + '<td><b>' + c.score + '</b></td>'
-         + '<td><div class="bb-bar"><i class="' + cls + '" style="width:' + c.score + '%"></i></div></td></tr>';
+         + '<td><div class="bb-lvcell"><div class="bb-bar"><i class="' + cls + '" style="width:' + c.score + '%"></i></div>'
+         + '<span class="bb-lvl ' + lvl[0] + '">' + lvl[1] + '</span></div></td></tr>';
     });
     h += '</tbody></table></div>';
 
@@ -558,16 +623,16 @@
       h += '<div class="bb-top3"><h4>Чинить первыми — топ-' + res.top3.length + ' слабых блоков</h4><ol>';
       res.top3.forEach(function (c) {
         var cat = CATS[c.id] || { t: [c.id, c.id] };
-        h += '<li><b>' + esc(BB.text(cat.t, state.mode)) + '</b> — ' + c.score + '/100'
+        h += '<li><b>' + esc(BB.text(cat.t, state.mode)) + '</b> — ' + c.score + '/100 · вес ' + c.w + '% в итоге'
            + '<span class="bb-adv">' + esc(c.advice) + '</span></li>';
       });
       h += '</ol></div>';
     }
 
-    h += '<p class="fx-thrline">' + esc(p.title) + ' · ' + esc(p.sub) + ' · светофор: критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75 · самооценка, не аудит</p>';
+    h += '<p class="fx-thrline">' + esc(p.title) + ' · ' + esc(p.sub) + ' · шкала 0–100, выше — лучше: критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75 · самооценка, не аудит · данные не покидают браузер</p>';
     h += '<div class="fx-actions" id="res-actions">'
-       + '<button class="ds-btn ds-btn--primary" id="btn-copy" type="button">копировать отчёт</button>'
-       + '<button class="ds-btn" id="btn-print" type="button">печать бланка</button>'
+       + '<button class="ds-btn ds-btn--primary" id="btn-copy" type="button">скопировать итог</button>'
+       + '<button class="ds-btn" id="btn-print" type="button">печать / PDF</button>'
        + '<button class="ds-btn" id="btn-again" type="button">пройти заново</button>'
        + '</div>';
 
@@ -576,7 +641,7 @@
 
     $('btn-copy').addEventListener('click', function () {
       var txt = BB.reportText(p, res, CATS, state.mode);
-      var done = function () { toast('отчёт скопирован — вставляйте в заметку или мессенджер'); };
+      var done = function () { toast('итог скопирован — вставляйте в заметку или мессенджер'); };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
       } else { fallbackCopy(txt, done); }

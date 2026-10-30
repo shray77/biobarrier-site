@@ -256,3 +256,61 @@ test('отчёт: язык режима — владелец и профи да�
   assert.ok(o.includes('Новые животные') && !o.includes('Завоз животных'), 'режим владельца не работает');
   assert.ok(pr.includes('Завоз животных'), 'режим профи не работает');
 });
+
+/* ---------- 8. тон: анкета без «казённого» языка проверяющего --------------- */
+
+/* Слова инспекции в языке ВЛАДЕЛЬЦА (q[0], why, варианты t[0], советы категорий).
+ * Фидбек поля v0.1: честный ответ не должен ощущаться самооговором, который
+ * «летит в Роспотребнадзор». Профессиональный режим (q[1]/t[1]) терминологию
+ * сохраняет — там «журнал посетителей» уместен. */
+const SNAG = ['журнал', 'регистрац', 'разрешени', 'регламент', 'сертифиц', 'свидетельств',
+  'договор', 'предписан', 'надзор', 'норматив', 'запрещ', 'штраф', 'виноват', 'признан'];
+
+function ownerStrings(q) {
+  return [q.q[0], q.why].concat(q.opts.map((o) => (Array.isArray(o.t) ? o.t[0] : o.t)));
+}
+
+test('тон: язык владельца без слов проверяющего (журнал/договор/разрешение…)', () => {
+  for (const [id, q] of Object.entries(BANK)) {
+    const joined = ownerStrings(q).join(' ').toLowerCase();
+    for (const w of SNAG) {
+      assert.ok(!joined.includes(w), `${id}: «${w}» в языке владельца — запах проверки, переписать`);
+    }
+  }
+  for (const [id, c] of Object.entries(CATS)) {
+    const a = c.advice.toLowerCase();
+    for (const w of SNAG) {
+      assert.ok(!a.includes(w), `${id}: «${w}» в совете — язык проверяющего`);
+    }
+  }
+});
+
+/* ---------- 9. светофор: пороги стабильны ------------------------------------ */
+
+test('светофор: пороги 50/75 не дрейфуют, направление — выше лучше', () => {
+  assert.equal(BioBarrier.level(0).code, 'bad');
+  assert.equal(BioBarrier.level(49.9).code, 'bad');
+  assert.equal(BioBarrier.level(50).code, 'mid');
+  assert.equal(BioBarrier.level(74.9).code, 'mid');
+  assert.equal(BioBarrier.level(75).code, 'good');
+  assert.equal(BioBarrier.level(100).code, 'good');
+});
+
+/* ---------- 10. витрина: шкала направления и печать светофора ---------------- */
+
+test('витрина: шкала 0–100 с зонами и маркером у итога', () => {
+  const html = readFileSync(join(HERE, '..', 'index.html'), 'utf8');
+  assert.ok(html.includes('fx-scalewrap'), 'нет обёртки шкалы итога');
+  assert.ok(html.includes('fx-scale-note'), 'нет подписи шкалы');
+  assert.ok(html.includes('выше — лучше'), 'направление шкалы не названо явно');
+  assert.ok(html.includes('bb-lvl'), 'нет слов-уровней у полос категорий');
+});
+
+test('витрина: светофор печатается в PDF — print-color-adjust в @media print', () => {
+  const html = readFileSync(join(HERE, '..', 'index.html'), 'utf8');
+  assert.ok(/@media\s+print/.test(html), 'нет print-стилей вообще');
+  assert.ok(html.includes('print-color-adjust: exact'), 'нет print-color-adjust: полосы в PDF пустые');
+  assert.ok(html.includes('-webkit-print-color-adjust: exact'), 'нет -webkit-префикса для Safari');
+  assert.ok(/beforeprint/.test(html), 'печать не переводит тёмную тему в белую');
+  assert.ok(html.includes('bb-privacy'), 'нет баннера «зеркало, а не проверка»');
+});
