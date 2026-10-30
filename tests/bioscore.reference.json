@@ -1,70 +1,121 @@
 {
   "poultry": {
-    "min": {
-      "total": 0.5,
-      "ext": 0.8,
-      "int": 0
-    },
-    "max": {
+    "best": {
       "total": 100,
       "ext": 100,
       "int": 100
     },
+    "worst": {
+      "total": 0.3,
+      "ext": 0.5,
+      "int": 0
+    },
     "seeded": {
-      "total": 48.1,
-      "ext": 49.4,
-      "int": 45.5
+      "total": 51.1,
+      "ext": 49.7,
+      "int": 53.5
     }
   },
   "pigs": {
-    "min": {
-      "total": 0.6,
-      "ext": 0.8,
-      "int": 0
-    },
-    "max": {
+    "best": {
       "total": 100,
       "ext": 100,
       "int": 100
     },
+    "worst": {
+      "total": 0.5,
+      "ext": 0.7,
+      "int": 0
+    },
     "seeded": {
-      "total": 49.3,
-      "ext": 51,
-      "int": 46
+      "total": 50.9,
+      "ext": 51.6,
+      "int": 49.7
     }
   },
   "dairy": {
-    "min": {
-      "total": 0.7,
-      "ext": 1.3,
-      "int": 0
-    },
-    "max": {
+    "best": {
       "total": 100,
       "ext": 100,
       "int": 100
     },
+    "worst": {
+      "total": 0.6,
+      "ext": 1.1,
+      "int": 0
+    },
     "seeded": {
-      "total": 49.8,
-      "ext": 46.7,
-      "int": 53.7
+      "total": 49,
+      "ext": 49.1,
+      "int": 48.9
     }
   },
   "mixed": {
-    "min": {
-      "total": 0.9,
-      "ext": 1.3,
-      "int": 0
-    },
-    "max": {
+    "best": {
       "total": 100,
       "ext": 100,
       "int": 100
     },
+    "worst": {
+      "total": 0.7,
+      "ext": 1,
+      "int": 0
+    },
     "seeded": {
-      "total": 51.4,
-      "ext": 49.3,
-      "int": 57
+      "total": 50.5,
+      "ext": 50.9,
+      "int": 49.3
+    }
+  },
+  "beef": {
+    "best": {
+      "total": 100,
+      "ext": 100,
+      "int": 100
+    },
+    "worst": {
+      "total": 0.6,
+      "ext": 0.9,
+      "int": 0
+    },
+    "seeded": {
+      "total": 50.8,
+      "ext": 50.2,
+      "int": 51.9
+    }
+  },
+  "smallrum": {
+    "best": {
+      "total": 100,
+      "ext": 100,
+      "int": 100
+    },
+    "worst": {
+      "total": 0.5,
+      "ext": 0.7,
+      "int": 0
+    },
+    "seeded": {
+      "total": 51.6,
+      "ext": 53.3,
+      "int": 47.4
+    }
+  },
+  "quail": {
+    "best": {
+      "total": 100,
+      "ext": 100,
+      "int": 100
+    },
+    "worst": {
+      "total": 0.6,
+      "ext": 1.1,
+      "int": 0
+    },
+    "seeded": {
+      "total": 49.5,
+      "ext": 51.2,
+      "int": 47.3
     }
   }
 }

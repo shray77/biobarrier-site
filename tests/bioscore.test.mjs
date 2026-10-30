@@ -28,6 +28,9 @@ import '../data-poultry.js';
 import '../data-pigs.js';
 import '../data-dairy.js';
 import '../data-mixed.js';
+import '../data-beef.js';
+import '../data-smallrum.js';
+import '../data-quail.js';
 import BioBarrier from '../bioscore.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -53,18 +56,19 @@ test('банк: у каждого вопроса есть «почему»', () 
   }
 });
 
-test('банк: варианты 2+, баллы строго растут, в пределах 0..100, максимум 100', () => {
+test('банк: варианты 2+, баллы строго убывают, в пределах 0..100, лучший = 100', () => {
   for (const [id, q] of Object.entries(BANK)) {
     assert.ok(q.opts.length >= 2, `${id}: меньше двух вариантов`);
-    let prev = -1;
+    let prev = 101;
     for (const o of q.opts) {
       assert.ok(Number.isFinite(o.s) && o.s >= 0 && o.s <= 100, `${id}: балл вне 0..100`);
-      assert.ok(o.s > prev, `${id}: баллы не растут (${prev} → ${o.s})`);
+      assert.ok(o.s < prev, `${id}: баллы не убывают (${prev} → ${o.s})`);
       prev = o.s;
     }
-    assert.equal(q.opts[q.opts.length - 1].s, 100, `${id}: лучший вариант ≠ 100`);
-    /* нижняя ступень может быть мягкой (arr-04: «почти всё покупаю» — 30,
-     * не ноль): контракт — «худший вариант первый и он ниже всех», а не «= 0» */
+    assert.equal(q.opts[0].s, 100, `${id}: лучший вариант ≠ 100`);
+    /* v0.3: варианты идут от лучшего к худшему — анкета читается «от нормы
+     * к проблеме», а не списком самооговоров; худшая ступень может быть
+     * мягкой (arr-04: «почти всё покупаю» — 30, не ноль) */
   }
 });
 
@@ -118,10 +122,10 @@ test('пакеты: есть и внешние, и внутренние кате
   }
 });
 
-test('пакеты: объём v0.1 — честные 40+ вопросов на пакет', () => {
+test('пакеты: объём v0.3 — честные 60+ вопросов на пакет (у Biocheck — 79)', () => {
   for (const p of Object.values(PACKS)) {
     const n = BioBarrier.questionCount(p);
-    assert.ok(n >= 40, `${p.id}: всего ${n} вопросов — ниже заявленного v0.1`);
+    assert.ok(n >= 60, `${p.id}: всего ${n} вопросов — ниже заявленного v0.3`);
   }
 });
 
@@ -140,16 +144,18 @@ test('бенчмарки: числа в 0..100 и источник; свиньи
   assert.equal(PACKS.pigs.bench.total, null, 'свиньи: итогового бенчмарка в источнике нет — не выдумывать');
 });
 
-test('мелкое хозяйство: бенчмарка нет — и это проверяется', () => {
-  assert.equal(PACKS.mixed.bench, null, 'пакет mixed не должен иметь бенчмарка: аналогов ЛПХ в мире нет');
+test('пакеты без бенчмарка: ЛПХ, откорм КРС, жвачные, перепела — и это проверяется', () => {
+  for (const id of ['mixed', 'beef', 'smallrum', 'quail']) {
+    assert.equal(PACKS[id].bench, null, `${id}: не должен иметь бенчмарка — опубликованных средних нет`);
+  }
 });
 
 /* ---------- 4. арифметика на синтетике (руки) ------------------------------ */
 
 const SYN_BANK = {
-  's-a1': { cat: 'sa', q: ['a1?', 'a1p?'], why: '…', opts: [{ t: 'плохо', s: 0 }, { t: 'середина', s: 50 }, { t: 'хорошо', s: 100 }] },
-  's-a2': { cat: 'sa', q: ['a2?', 'a2p?'], why: '…', opts: [{ t: 'плохо', s: 0 }, { t: 'середина', s: 50 }, { t: 'хорошо', s: 100 }] },
-  's-b1': { cat: 'sb', q: ['b1?', 'b1p?'], why: '…', opts: [{ t: 'плохо', s: 0 }, { t: 'хорошо', s: 100 }] }
+  's-a1': { cat: 'sa', q: ['a1?', 'a1p?'], why: '…', opts: [{ t: 'хорошо', s: 100 }, { t: 'середина', s: 50 }, { t: 'плохо', s: 0 }] },
+  's-a2': { cat: 'sa', q: ['a2?', 'a2p?'], why: '…', opts: [{ t: 'хорошо', s: 100 }, { t: 'середина', s: 50 }, { t: 'плохо', s: 0 }] },
+  's-b1': { cat: 'sb', q: ['b1?', 'b1p?'], why: '…', opts: [{ t: 'хорошо', s: 100 }, { t: 'плохо', s: 0 }] }
 };
 const SYN_CATS = {
   sa: { t: ['SA', 'SA'], g: 'ext', advice: 'починить SA' },
@@ -165,14 +171,14 @@ const SYN_PACK = {
 };
 
 test('движок: все «хорошо» → 100/100, все «плохо» → 0', () => {
-  const hi = { 's-a1': 2, 's-a2': 2, 's-b1': 1 };
-  const lo = { 's-a1': 0, 's-a2': 0, 's-b1': 0 };
+  const hi = { 's-a1': 0, 's-a2': 0, 's-b1': 0 }; /* v0.3: лучший — первый */
+  const lo = { 's-a1': 2, 's-a2': 2, 's-b1': 1 };
   assert.equal(BioBarrier.compute(SYN_PACK, hi, SYN_CATS, SYN_BANK).total, 100);
   assert.equal(BioBarrier.compute(SYN_PACK, lo, SYN_CATS, SYN_BANK).total, 0);
 });
 
 test('движок: ручной расчёт — SA=(100+50)/2=75, SB=0 → 0.6×75 + 0.4×0 = 45', () => {
-  const ans = { 's-a1': 2, 's-a2': 1, 's-b1': 0 };
+  const ans = { 's-a1': 0, 's-a2': 1, 's-b1': 1 };
   const r = BioBarrier.compute(SYN_PACK, ans, SYN_CATS, SYN_BANK);
   assert.equal(r.total, 45);
   assert.equal(r.ext, 75);
@@ -180,7 +186,7 @@ test('движок: ручной расчёт — SA=(100+50)/2=75, SB=0 → 0.6
 });
 
 test('движок: топ-3 — слабейшие вперёд, при равенстве вес важнее', () => {
-  const ans = { 's-a1': 2, 's-a2': 1, 's-b1': 0 }; /* SB=0 слабейший → первый */
+  const ans = { 's-a1': 0, 's-a2': 1, 's-b1': 1 }; /* SB=0 слабейший → первый */
   const r = BioBarrier.compute(SYN_PACK, ans, SYN_CATS, SYN_BANK);
   assert.equal(r.top3[0].id, 'sb');
   assert.ok(r.top3[0].advice.includes('SB'));
@@ -189,7 +195,7 @@ test('движок: топ-3 — слабейшие вперёд, при рав�
 /* ---------- 5. частичный скор ----------------------------------------------- */
 
 test('частичный скор: пропущенные исключаются из числителя И знаменателя', () => {
-  const ans = { 's-a1': 2 }; /* отвечена только SA-1 (100): SA=100, SB нет */
+  const ans = { 's-a1': 0 }; /* отвечена только SA-1 (100): SA=100, SB нет */
   const r = BioBarrier.compute(SYN_PACK, ans, SYN_CATS, SYN_BANK);
   assert.equal(r.total, 100); /* вес SB исключён из знаменателя */
   assert.equal(r.missing, 2);
@@ -206,14 +212,16 @@ test('частичный скор: ноль ответов → total null, а н
 
 const REF = JSON.parse(readFileSync(join(HERE, 'bioscore.reference.json'), 'utf8'));
 
+/* v0.3: варианты идут от лучшего к худшему — 'best' выбирает первый
+ * индекс, 'worst' — последний, 'seeded' — детерминированный разнобой. */
 function patternAnswers(p, pattern) {
   const answers = {};
   let i = 0;
   for (const c of p.cats) {
     for (const qid of c.qs) {
       const n = BANK[qid].opts.length;
-      if (pattern === 'min') { answers[qid] = 0; }
-      else if (pattern === 'max') { answers[qid] = n - 1; }
+      if (pattern === 'best') { answers[qid] = 0; }
+      else if (pattern === 'worst') { answers[qid] = n - 1; }
       else { answers[qid] = (i * 7 + 3) % n; } /* seeded: детерминированный разнобой */
       i += 1;
     }
@@ -222,7 +230,7 @@ function patternAnswers(p, pattern) {
 }
 
 for (const p of Object.values(PACKS)) {
-  for (const pattern of ['min', 'max', 'seeded']) {
+  for (const pattern of ['best', 'worst', 'seeded']) {
     test(`золото: ${p.id} × ${pattern} — тотал не дрейфует`, () => {
       const r = BioBarrier.compute(p, patternAnswers(p, pattern), CATS, BANK);
       const frozen = REF[p.id][pattern];
@@ -253,8 +261,10 @@ test('отчёт: язык режима — владелец и профи да�
   const r = BioBarrier.compute(p, patternAnswers(p, 'seeded'), CATS, BANK);
   const o = BioBarrier.reportText(p, r, CATS, 0);
   const pr = BioBarrier.reportText(p, r, CATS, 1);
-  assert.ok(o.includes('Новые животные') && !o.includes('Завоз животных'), 'режим владельца не работает');
-  assert.ok(pr.includes('Завоз животных'), 'режим профи не работает');
+  assert.notStrictEqual(o, pr, 'режим языка не меняет отчёт');
+  const t = CATS[r.top3[0].id].t; /* топ-3 зависит от ответов — проверяем реальную пару */
+  assert.ok(o.includes(t[0]), 'режим владельца не работает');
+  assert.ok(pr.includes(t[1]) && !pr.includes(t[0]), 'режим профи не работает');
 });
 
 /* ---------- 8. тон: анкета без «казённого» языка проверяющего --------------- */
@@ -262,9 +272,14 @@ test('отчёт: язык режима — владелец и профи да�
 /* Слова инспекции в языке ВЛАДЕЛЬЦА (q[0], why, варианты t[0], советы категорий).
  * Фидбек поля v0.1: честный ответ не должен ощущаться самооговором, который
  * «летит в Роспотребнадзор». Профессиональный режим (q[1]/t[1]) терминологию
- * сохраняет — там «журнал посетителей» уместен. */
+ * сохраняет — там «журнал посетителей» уместен.
+ * v0.3: туда же — маркеры снисходительности («кое-как», «как повезёт»):
+ * фидбек поля повторно: «формат текста, будто это явка с повинной». */
 const SNAG = ['журнал', 'регистрац', 'разрешени', 'регламент', 'сертифиц', 'свидетельств',
-  'договор', 'предписан', 'надзор', 'норматив', 'запрещ', 'штраф', 'виноват', 'признан'];
+  'договор', 'предписан', 'надзор', 'норматив', 'запрещ', 'штраф', 'виноват', 'признан',
+  'кое-как', 'как повезёт', 'всё подряд', 'рой стоит', 'вещь же хорошая', 'что найду',
+  'побрызгали', 'днями может', 'разгрузили и ладно', 'как выглядит — так и хорошо',
+  'телится где придётся', 'ходят где хотят'];
 
 function ownerStrings(q) {
   return [q.q[0], q.why].concat(q.opts.map((o) => (Array.isArray(o.t) ? o.t[0] : o.t)));
