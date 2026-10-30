@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: 20
       - name: Известные ответы + золото тоталов + структура банка + payload бенчмарка v0.4
-        run: node --test tests/
+        run: node --test tests/bioscore.test.mjs tests/telemetry.test.mjs

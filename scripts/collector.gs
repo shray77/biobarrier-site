@@ -14,8 +14,11 @@
  *  - doGet: считает агрегаты по всей таблице (n, среднее, медиана,
  *    распределение светофора, гистограмма 0–100, разрезы по типам
  *    хозяйств / округам / размерам / категориям) и отдаёт JSON;
- *    с параметром ?callback=Имя — JSONP для страховки от CORS-капризов.
- *    Агрегат кешируется на 60 секунд, чтобы не пересчитывать таблицу
+ *    с параметром ?callback=Имя — JSONP для ручной проверки в браузере
+ *    (имя валидируется регэкспом). Группы с числом записей ниже
+ *    порога (n < 3, по категориям n < 5) не публикуются вовсе —
+ *    одиночный итог чужого хозяйства — не агрегат; агрегат
+ *    кешируется на 60 секунд, чтобы не пересчитывать таблицу
  *    на каждый чих;
  *  - setup(): создаёт лист с заголовками — запустить один раз из редактора
  *    (Run → setup), до Deploy.
@@ -32,12 +35,16 @@
 
 var SHEET = 'submissions';
 var CACHE_SEC = 60;
+var MIN_N = 3;        /* публиковать группы только от 3 записей: n=1 — чужой итог */
+var MIN_CAT_N = 5;    /* по категориям строже: разрез мельче */
+var DAY_LIMIT = 500;  /* суточный лимит записей — защита от ботов и выжигания квот */
 
 var PKGS = ['mixed', 'poultry', 'pigs', 'dairy', 'beef', 'smallrum', 'quail'];
 var BANDS = ['bad', 'mid', 'good'];
 var SCALE_CODES = ['s', 'm', 'l'];
 var REGIONS = ['ЦФО', 'СЗФО', 'ЮФО', 'СКФО', 'ПФО', 'УФО', 'СФО', 'ДФО'];
 var TS_RE = /^\d{4}-\d{2}-\d{2}$/;
+var CAT_ID_RE = /^[a-z][a-z0-9]{1,11}$/;  /* зеркало telemetry.js: без __proto__ */
 
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -73,10 +80,11 @@ function valid(d) {
   if (ids.length < 1 || ids.length > 40) { return false; }
   for (var i = 0; i < ids.length; i++) {
     var v = d.cats[ids[i]];
+    if (!CAT_ID_RE.test(ids[i])) { return false; }
     if (typeof v !== 'number' || !isFinite(v) || v < 0 || v > 100) { return false; }
   }
-  if (typeof d.ans !== 'number' || d.ans < 0 || Math.floor(d.ans) !== d.ans) { return false; }
-  if (typeof d.out !== 'number' || d.out < 0 || Math.floor(d.out) !== d.out) { return false; }
+  if (typeof d.ans !== 'number' || !isFinite(d.ans) || d.ans < 0 || Math.floor(d.ans) !== d.ans) { return false; }
+  if (typeof d.out !== 'number' || !isFinite(d.out) || d.out < 0 || Math.floor(d.out) !== d.out) { return false; }
   if (d.ans > d.out) { return false; }
   return true;
 }
@@ -91,12 +99,19 @@ function doPost(e) {
   try {
     var d = JSON.parse(e && e.postData ? e.postData.contents : 'null');
     if (!valid(d)) { return out_({ ok: false, why: 'payload не прошёл белый список' }); }
+    /* v0.4.1: суточный лимит — URL публичен по построению, и без лимита
+     * бот с валидной формой выжигает квоты и топит агрегаты мусором. */
+    var props = PropertiesService.getScriptProperties();
+    var day = Utilities.formatDate(new Date(), 'UTC', 'yyyyMMdd');
+    var cnt = Number(props.getProperty('day-' + day) || 0);
+    if (cnt >= DAY_LIMIT) { return out_({ ok: false, why: 'суточный лимит отправок' }); }
     lock.waitLock(5000); /* appendRow атомарно при гонке вкладок */
     sheet_().appendRow([
       new Date().toISOString(), d.v, d.pkg, d.ts,
       d.region === null ? '' : d.region, d.scale === null ? '' : d.scale,
       d.total, d.band, d.ans, d.out, JSON.stringify(d.cats)
     ]);
+    props.setProperty('day-' + day, String(cnt + 1));
     return out_({ ok: true });
   } catch (err) {
     return out_({ ok: false, why: 'ошибка записи' });
@@ -170,6 +185,7 @@ function aggregate_() {
     });
     var out = {};
     Object.keys(acc).forEach(function (k) {
+      if (acc[k].n < MIN_N) { return; } /* n=1/2 — чужие одиночные итоги, не агрегат */
       out[k] = { n: acc[k].n, mean: +(acc[k].sum / acc[k].n).toFixed(1) };
     });
     return out;
@@ -185,6 +201,7 @@ function aggregate_() {
   });
   var byCat = {};
   Object.keys(catAcc).forEach(function (cid) {
+    if (catAcc[cid].n < MIN_CAT_N) { return; }
     byCat[cid] = { n: catAcc[cid].n, mean: +(catAcc[cid].sum / catAcc[cid].n).toFixed(1) };
   });
 

@@ -3,15 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>БиоБарьер — скоринг биобезопасности хозяйства</title>
+<title>БиоБарьер — проверка биобезопасности хозяйства по баллам 0–100</title>
 <meta name="description" content="Анкета биобезопасности на 0–100: семь пакетов — птица, свиньи, молочный КРС, откорм КРС, овцы и козы, перепела и мелкое смешанное хозяйство (ЛПХ). Два режима языка: владелец и профессионал. Зарубежные бенчмарки Biocheck.UGent и топ-3 слабых блоков «что чинить первым». Считает в браузере; по желанию — анонимный итог в первый русский бенчмарк (opt-in).">
-<meta property="og:title" content="БиоБарьер — скоринг биобезопасности хозяйства">
+<meta property="og:title" content="БиоБарьер — проверка биобезопасности хозяйства по баллам 0–100">
 <meta property="og:description" content="Риск-ориентированная анкета 0–100 с бенчмарками Biocheck.UGent: птица, свиньи, молочный КРС, откорм, овцы и козы, перепела — и впервые мелкое смешанное хозяйство. По желанию итог уходит в анонимный русский бенчмарк (opt-in).">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://shray77.github.io/biobarrier-site/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://shray77.github.io/biobarrier-site/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://shray77.github.io/biobarrier-site/">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F6B47' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z'/><path d='m9 12 2 2 4-4'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -53,13 +55,15 @@
   .bb-pack:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
   .bb-pack[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
   .bb-pack svg { width: 30px; height: 30px; color: var(--accent); }
-  .bb-pack h3 { margin: 2px 0 0; font: 600 16.5px var(--ds-font-sans); }
+  .bb-pack h3, .bb-pack .bb-pack-t { margin: 2px 0 0; font: 600 16.5px var(--ds-font-sans); }
   .bb-pack .bb-pack-sub { margin: 0; font-size: 12.5px; color: var(--muted); }
   .bb-pack .bb-pack-meta { margin: 2px 0 0; font: 500 11px var(--mono); color: var(--faint); }
   .bb-pack .bb-pack-about { margin: 0; font-size: 12px; color: var(--muted); }
 
   /* -- анкета --------------------------------------------------------------- */
-  .bb-ctrl { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .bb-ctrl { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    /* v0.4.1: липкий прогресс — у 70-вопросной простыни должен быть виден конец пути */
+    position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0 8px; border-bottom: 1px solid var(--border); }
   .bb-mode { display: inline-flex; border: 1px solid var(--border); border-radius: var(--ds-radius-s); overflow: hidden; }
   .bb-mode label { padding: 7px 14px; font: 600 12.5px var(--mono); color: var(--muted); cursor: pointer; background: var(--surface2); }
   .bb-mode input { position: absolute; opacity: 0; pointer-events: none; }
@@ -102,6 +106,10 @@
     padding: 10px 12px; margin: 0 0 14px; font-size: 13px; color: var(--muted); }
   .bb-privacy svg { flex: none; width: 15px; height: 15px; color: var(--accent); margin-top: 3px; }
   .bb-privacy b { color: var(--text); }
+  /* статусная строка мастера: точка была без стилей — невидима */
+  .live { display: inline-flex; align-items: center; gap: 7px; font: 500 11.5px var(--mono); color: var(--muted); }
+  .live .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .live .dot.ok { background: var(--green); }
 
   /* -- результат ------------------------------------------------------------ */
   .fx-res { margin-top: 4px; }
@@ -126,7 +134,7 @@
   .fx-ticks span { position: absolute; transform: translateX(-50%); }
   .fx-ticks span:first-child { transform: none; }
   .fx-ticks span:last-child { transform: translateX(-100%); }
-  .fx-scale-note { font: 11px var(--mono); color: var(--faint); margin: 3px 0 0; }
+  .fx-scale-note { font: 12.5px var(--mono); color: var(--muted); margin: 3px 0 0; }
   .fx-warn { border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); background: color-mix(in srgb, var(--amber) 9%, transparent);
     border-radius: var(--ds-radius-s); padding: 10px 12px; font-size: 13px; color: var(--text); margin: 10px 0; }
   .fx-warn b { color: var(--amber); }
@@ -240,7 +248,7 @@
     .fx-scalewrap { max-width: 400px; margin: 6px 0 0; padding-top: 4px; }
     .fx-scale { height: 8px; }
     .fx-mark { height: 16px; }
-    .fx-scale-note { font-size: 9px; margin-top: 2px; }
+    .fx-scale-note { font-size: 10px; margin-top: 2px; }
     .bb-cats-tbl .bb-lvcell { gap: 6px; }
     body { font-size: 11.5px; }
     .ds-masthead { padding: 4px 0 6px; }
@@ -284,14 +292,14 @@
 
 <header class="ds-masthead">
   <div class="wrap">
-    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.4</span></div>
+    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.4.1</span></div>
   </div>
   <div class="wrap ds-masthead__row">
     <div class="ds-masthead__brand">
       <div class="ds-masthead__logo"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <div>
         <h1 class="ds-masthead__title">БиоБарьер — скоринг биобезопасности хозяйства</h1>
-        <p class="ds-masthead__sub">Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит анкету и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела. Считает в браузере — ответы не покидают устройство, делиться можно только анонимным итогом; это зеркало для хозяина, а не проверка.</p>
+        <p class="ds-masthead__sub">Считает в браузере — ответы не покидают устройство; это зеркало для хозяина, а не проверка. Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит её и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела.</p>
       </div>
     </div>
     <div class="ds-masthead__side">
@@ -312,6 +320,10 @@
   <section class="fx" id="pick">
     <h2>Выберите хозяйство</h2>
     <p class="sub">Формулировки вопросов меняются переключателем режима ниже — «владелец» говорит бытовым языком, «профессионал» — терминами.</p>
+    <div class="bb-privacy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <p><b>Зеркало, а не проверка.</b> Считает ваш браузер — ответы не покидают телефон. Низкий балл не признание, а план улучшения.</p>
+    </div>
     <div class="bb-packs" id="packs"></div>
   </section>
 
@@ -328,7 +340,7 @@
         <label><input type="radio" name="bb-mode" value="0" checked>владелец</label>
         <label><input type="radio" name="bb-mode" value="1">профессионал</label>
       </div>
-      <div class="bb-prog"><span id="prog-text">отвечено 0 из 0</span><div class="bb-track"><i id="prog-bar"></i></div></div>
+      <div class="bb-prog"><span id="prog-text" aria-live="polite">отвечено 0 из 0</span><div class="bb-track"><i id="prog-bar"></i></div></div>
       <button class="ds-btn ds-btn--sm" id="btn-reset" type="button">сбросить ответы</button>
     </div>
     <div id="quiz-body"></div>
@@ -347,7 +359,7 @@
   <!-- ======================= БЕНЧМАРК РОССИИ (v0.4, opt-in) ================ -->
   <section class="fx" id="bench">
     <h2>Бенчмарк России</h2>
-    <p class="sub">Своих средних по биобезопасности в стране не обмерял никто — проект собирает первый русский бенчмарк: только добровольные анонимные итоги, включая ЛПХ.</p>
+    <p class="sub">Своих средних по биобезопасности в стране не считал никто. Мы готовим первый русский сбор анонимных итогов — он ещё не открыт; ниже — ваша личная динамика, которая хранится в этом браузере.</p>
     <div id="bench-body" aria-live="polite"></div>
   </section>
 
@@ -355,14 +367,14 @@
   <section class="fx" id="method">
     <h2>Методология</h2>
     <details class="fx-method">
-      <summary>подробнее: как считается скор, откуда веса и бенчмарки, ограничения метода и план расширения</summary>
+      <summary>подробнее: как считается балл, откуда веса и бенчмарки, ограничения метода и план расширения</summary>
 
       <article class="doc">
       <p class="ds-lede"><span class="ds-dropcap">Б</span>иобезопасность — сумма барьеров между инфекцией и вашим стадом. Измерить её напрямую нельзя, но можно оценить косвенно: анкетой по наблюдаемым практикам. Подход «риск-ориентированного скоринга» разработан в Гентском университете (Biocheck.UGent, Dewulf и соавт.) и валидирован на тысячах ферм Европы и Азии; БиоБарьер — независимая русскоязычная реконструкция этого подхода, а не копия анкеты.</p>
 
       <h2>Как считается</h2>
       <p>Каждый вопрос имеет градуированные варианты ответа со своими баллами от 0 до 100. Категория (например «Новые животные» или «Мойка и дезинфекция») — среднее по отвеченным вопросам. Итог — взвешенное среднее категорий:</p>
-      <div class="fx-formula">скор = Σ (вес категории × скор категории) / Σ весов отвеченных категорий</div>
+      <div class="fx-formula">итог = Σ (вес категории × балл категории) / Σ весов отвеченных категорий</div>
       <p>Пропущенные вопросы исключаются из расчёта честно: и из числителя, и из знаменателя — но итог честнее заполнять целиком, о пропусках результат предупреждает. Внешний блок («занос») и внутренний («внутри хозяйства») агрегируются отдельно по своим категориям. Веса категорий заданы профилем пакета: у птицы поднят вес грызунов и дикой птицы (грипп птиц), у свиней — перевозок (АЧС), у молочного КРС — доения; сумма весов каждого пакета равна 100 и гейтится автотестами.</p>
 
       <h2>Бенчмарки — зарубежные, и это честно сказано</h2>
@@ -385,12 +397,12 @@
       <ul>
         <li><b>Это самооценка, а не аудит.</b> Анкету заполняет человек по своим наблюдениям; намеренное или случайное приукрашивание инструмент не ловит.</li>
         <li><b>Веса — редакционные.</b> Профили весов собраны по логике рисков и публикациям Biocheck, но не прошли российскую полевую валидацию. Читайте разрезы, а не десятую долю балла.</li>
-        <li><b>Скор не заменяет ветеринара.</b> Он показывает, где барьеры тонкие; конкретные меры назначает специалист по вашему хозяйству.</li>
+        <li><b>Балл не заменяет ветеринара.</b> Он показывает, где барьеры тонкие; конкретные меры назначает специалист по вашему хозяйству.</li>
         <li><b>Приватность.</b> Ответы хранятся только в вашем браузере (localStorage); по умолчанию ничего не отправляется. Единственная отправка — анонимный итог по вашей кнопке: без имени, контактов и идентификаторов устройства (см. «Бенчмарк России» и <a href="./terms.html">условия</a>).</li>
       </ul>
 
       <h2>План расширения</h2>
-      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. v0.4 — бенчмарк России: opt-in отправка анонимного итога одной кнопкой (тип хозяйства, итог и разрез категорий, по желанию округ и размер поголовья), витрина агрегатов «Бенчмарк России» и личная динамика прогонов. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
+      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. v0.4 — бенчмарк России: opt-in отправка анонимного итога одной кнопкой (тип хозяйства, итог и разрез категорий, по желанию округ и размер поголовья), витрина агрегатов «Бенчмарк России» и личная динамика прогонов. v0.4.1 — гигиена первого среза: маскировка малых групп на коллекторе (порог n ≥ 3), суточный лимит отправок, санитайзер агрегатов в витрине, JSONP-фолбэк удалён, снятие ответа повторным кликом, липкий прогресс анкеты и подтверждения сброса. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
       </article>
     </details>
   </section>
@@ -399,7 +411,7 @@
 <footer class="ds-footer ds-footer--meta">
   <div class="wrap">
     <span class="legal">самооценка биобезопасности · не аудит и не ветеринарная консультация · бенчмарки — зарубежные публикации · <a href="./terms.html">условия и дисклеймер</a></span>
-    <span>v0.4 · подход — риск-ориентированный скоринг по мотивам Biocheck.UGent · бенчмарк России — opt-in, анонимно · арифметика и payload гейтятся известными ответами (node --test)</span>
+    <span>v0.4.1 · подход — риск-ориентированная оценка по мотивам Biocheck.UGent · бенчмарк России — opt-in, анонимно · арифметика и payload гейтятся известными ответами (node --test)</span>
     <span>источники: <a href="https://www.biocheckgent.com/en/about-us/how-our-checklists-are-built">Biocheck.UGent</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7597688">бройлеры, Филиппины</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4359795">свиньи, Швеция</a> · <a href="https://link.springer.com/article/10.1186/s40813-018-0113-6">свиньи, Ирландия</a> · <a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815220300174">КРС</a> · ядро — <a href="https://github.com/shray77/vet-ds">vet-ds</a> · <a href="https://github.com/shray77/biobarrier-site">репозиторий</a></span>
   </div>
 </footer>
@@ -463,18 +475,23 @@
   };
 
   /* ---- карточки пакетов ------------------------------------------------------ */
+  function plural(n, one, few, many) {
+    var m10 = n % 10, m100 = n % 100;
+    return n + ' ' + (m10 === 1 && m100 !== 11 ? one : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? few : many));
+  }
+
   function renderPacks() {
     var order = ['mixed', 'poultry', 'pigs', 'dairy', 'beef', 'smallrum', 'quail'];
     var h = '';
     order.forEach(function (id) {
       var p = PACKS[id];
       var n = BB.questionCount(p);
-      var bench = p.bench ? 'бенчмарк: ' + esc(p.bench.label) : 'бенчмарка в мире нет — только светофор';
+      var bench = p.bench ? 'бенчмарк: ' + esc(p.bench.label) : 'сравнить пока не с чем — смотрите зоны баллов';
       h += '<button class="bb-pack" type="button" data-pack="' + id + '" aria-pressed="' + (state.pack === id) + '">'
         + ICONS[p.icon]
-        + '<h3>' + esc(p.title) + '</h3>'
+        + '<span class="bb-pack-t">' + esc(p.title) + '</span>'
         + '<p class="bb-pack-sub">' + esc(p.sub) + '</p>'
-        + '<p class="bb-pack-meta">' + n + ' вопросов · ' + BB.categoryCount(p) + ' категорий</p>'
+        + '<p class="bb-pack-meta">' + plural(n, 'вопрос', 'вопроса', 'вопросов') + ' · ' + plural(BB.categoryCount(p), 'категория', 'категории', 'категорий') + '</p>'
         + '<p class="bb-pack-about">' + esc(p.about) + '</p>'
         + '<p class="bb-pack-meta">' + bench + '</p>'
         + '</button>';
@@ -487,7 +504,11 @@
     });
   }
 
+  function countAnswers() { return Object.keys(state.answers).length; }
+
   function selectPack(id) {
+    if (id !== state.pack && countAnswers() > 10
+        && !window.confirm('Ответы текущей анкеты будут стёрты. Сменить хозяйство?')) { return; }
     state.pack = id;
     state.answers = {};
     persist();
@@ -495,6 +516,7 @@
     renderQuiz();
     $('result').hidden = true;
     $('quiz').hidden = false;
+    try { $('quiz-title').setAttribute('tabindex', '-1'); $('quiz-title').focus({ preventScroll: true }); } catch (e) {}
     try { $('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
   }
 
@@ -505,7 +527,7 @@
     var p = pack();
     if (!p) { $('quiz').hidden = true; return; }
     $('quiz-title').textContent = 'Анкета — ' + p.title;
-    $('quiz-sub').textContent = p.sub + '. Формулировки меняются переключателем ниже; пропуск не портит балл.';
+    $('quiz-sub').textContent = p.sub + '. Ошиблись — нажмите на выбранный вариант ещё раз, он снимется; пропуск не портит балл.';
     var groups = [
       { g: 'ext', label: 'Внешняя биобезопасность — барьеры от заноса' },
       { g: 'int', label: 'Внутренняя биобезопасность — барьеры внутри хозяйства' }
@@ -537,7 +559,6 @@
       });
     });
     $('quiz-body').innerHTML = h;
-    $('quiz-body').addEventListener('change', onAnswer);
     updateProgress();
   }
 
@@ -550,6 +571,23 @@
     }
   }
 
+  /* v0.4.1: повторный клик по отмеченному варианту снимает ответ —
+   * обещание «можно пропустить» держится и после случайного клика. */
+  $('quiz-body').addEventListener('click', function (e) {
+    var lab = e.target && e.target.closest ? e.target.closest('label.radio') : null;
+    if (!lab) { return; }
+    var inp = lab.querySelector('input[type="radio"]');
+    if (!inp || !BANK[inp.name]) { return; }
+    var i = parseInt(inp.value, 10);
+    if (inp.checked && state.answers[inp.name] === i) {
+      inp.checked = false;
+      delete state.answers[inp.name];
+      persist();
+      updateProgress();
+    }
+  });
+  $('quiz-body').addEventListener('change', onAnswer);
+
   function updateProgress() {
     var p = pack();
     if (!p) { return; }
@@ -557,7 +595,10 @@
     var done = p.cats.reduce(function (a, c) {
       return a + c.qs.filter(function (qid) { return state.answers[qid] !== undefined; }).length;
     }, 0);
-    $('prog-text').textContent = 'отвечено ' + done + ' из ' + n;
+    var catsDone = p.cats.filter(function (c) {
+      return c.qs.every(function (qid) { return state.answers[qid] !== undefined; });
+    }).length;
+    $('prog-text').textContent = 'отвечено ' + done + ' из ' + n + ' · закрыто блоков ' + catsDone + ' из ' + p.cats.length;
     $('prog-bar').style.width = (n ? Math.round(100 * done / n) : 0) + '%';
   }
 
@@ -582,11 +623,13 @@
   });
 
   $('btn-reset').addEventListener('click', function () {
+    if (countAnswers() > 0 && !window.confirm('Стереть все ответы этой анкеты?')) { return; }
     state.answers = {};
     persist();
     renderQuiz();
   });
   $('btn-back').addEventListener('click', function () {
+    if (countAnswers() > 10 && !window.confirm('Ответы будут стёрты. Вернуться к выбору хозяйства?')) { return; }
     state.pack = null; state.answers = {};
     persist();
     $('quiz').hidden = true; $('result').hidden = true;
@@ -599,7 +642,8 @@
   });
 
   /* ---- результат -------------------------------------------------------------- */
-  var LEVEL_CLS = { good: 'ds-badge ds-badge--ok', mid: 'ds-badge ds-badge--warn', bad: 'ds-badge ds-badge--err' };
+  /* v0.4.1: классы --ok/--warn/--err не существовали в ДС — светофор вердикта был слепым */
+  var LEVEL_CLS = { good: 'ds-badge ds-badge--green', mid: 'ds-badge ds-badge--amber', bad: 'ds-badge ds-badge--red' };
 
   function fmt(v) { return v === null || v === undefined ? '—' : String(v); }
 
@@ -611,7 +655,7 @@
     var rows = [['ext', 'внешний (занос)'], ['int', 'внутренний (внутри)'], ['total', 'итог']].map(function (pair) {
       var k = pair[0];
       if (b[k] === null || b[k] === undefined) { return ''; }
-      var mine = res[k];
+      var mine = res[k] === null ? null : Math.round(res[k]);
       if (mine === null) { return ''; }
       var d = res.bench && res.bench.d && res.bench.d[k] !== undefined ? res.bench.d[k] : null;
       var dTxt = d === null ? '' : ' <b style="color:var(--' + (d >= 0 ? 'green' : 'red') + ')">' + (d >= 0 ? '+' : '') + d + '</b>';
@@ -629,7 +673,7 @@
     var h = '';
 
     if (res.total === null) {
-      h = '<div class="fx-empty">Пока не отвечено ни одного вопроса — вернитесь к анкете и отметьте хотя бы несколько. Скор честно считается по отвеченным: пропуски не притворяются нулями.</div>';
+      h = '<div class="fx-empty">Пока не отвечено ни одного вопроса — вернитесь к анкете и отметьте хотя бы несколько. Балл честно считается по отвеченным: пропуски не притворяются нулями.</div>';
       out.innerHTML = h;
       $('result').hidden = false;
       return;
@@ -637,7 +681,7 @@
 
     var v = res.level;
     h += '<div class="bb-print-note">БиоБарьер · ' + new Date().toLocaleDateString('ru-RU') + ' · распечатано для себя: расчёт — в браузере, без сервера</div>';
-    h += '<div class="fx-verdict"><span class="fx-big">' + res.total + '<small style="font-size:18px;color:var(--faint)">/100</small></span>'
+    h += '<div class="fx-verdict"><span class="fx-big">' + Math.round(res.total) + '<small style="font-size:18px;color:var(--faint)">/100 · выше — лучше</small></span>'
        + '<span class="' + (LEVEL_CLS[v.code] || '') + '">' + v.label + '</span>'
        + '<span class="fx-ci">' + v.why + '</span></div>';
 
@@ -657,30 +701,31 @@
        + '</div>';
 
     if (res.missing > 0) {
-      h += '<div class="fx-warn"><b>не отвечено ' + res.missing + ' из ' + res.totalQuestions + '.</b> Скор посчитан только по отвеченным — для полной картины вернитесь к пропускам.</div>';
+      h += '<div class="fx-warn"><b>не отвечено ' + res.missing + ' из ' + res.totalQuestions + '.</b> Балл посчитан только по отвеченным — для полной картины вернитесь к пропускам.</div>';
     }
 
     h += benchBlock(p, res);
 
-    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>разрез по категориям · полоса и цифра — скор категории, выше — лучше · вес — вклад категории в итог (Σ = 100)</caption>'
-       + '<thead><tr><th>категория</th><th>вес</th><th>скор</th><th style="width:38%">уровень</th></tr></thead><tbody>';
+    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>разрез по категориям · полоса и цифра — балл категории, выше — лучше · вес — вклад категории в итог (Σ = 100)</caption>'
+       + '<thead><tr><th>категория</th><th>вес</th><th>балл</th><th style="width:38%">уровень</th></tr></thead><tbody>';
     res.cats.forEach(function (c) {
       var cat = CATS[c.id] || { t: [c.id, c.id] };
       var cls = c.score >= 75 ? 's-good' : (c.score >= 50 ? 's-mid' : 's-bad');
       var lvl = c.score >= 75 ? ['good', 'крепко'] : (c.score >= 50 ? ['mid', 'есть дыры'] : ['bad', 'критично']);
       h += '<tr><td><b>' + esc(BB.text(cat.t, state.mode)) + '</b></td>'
          + '<td>' + c.w + '%</td>'
-         + '<td><b>' + c.score + '</b></td>'
+         + '<td><b>' + Math.round(c.score) + '</b></td>'
          + '<td><div class="bb-lvcell"><div class="bb-bar"><i class="' + cls + '" style="width:' + c.score + '%"></i></div>'
          + '<span class="bb-lvl ' + lvl[0] + '">' + lvl[1] + '</span></div></td></tr>';
     });
     h += '</tbody></table></div>';
 
     if (res.top3.length) {
-      h += '<div class="bb-top3"><h4>Чинить первыми — топ-' + res.top3.length + ' слабых блоков</h4><ol>';
+      var t3title = res.top3.length === 1 ? 'Чинить первым — самый слабый блок' : 'Чинить первыми — топ-' + res.top3.length + ' слабых блоков';
+      h += '<div class="bb-top3"><h4>' + t3title + '</h4><ol>';
       res.top3.forEach(function (c) {
         var cat = CATS[c.id] || { t: [c.id, c.id] };
-        h += '<li><b>' + esc(BB.text(cat.t, state.mode)) + '</b> — ' + c.score + '/100 · вес ' + c.w + '% в итоге'
+        h += '<li><b>' + esc(BB.text(cat.t, state.mode)) + '</b> — ' + Math.round(c.score) + '/100 · вес ' + c.w + '% в итоге'
            + '<span class="bb-adv">' + esc(c.advice) + '</span></li>';
       });
       h += '</ol></div>';
@@ -713,6 +758,7 @@
     });
     $('btn-print').addEventListener('click', function () { window.print(); });
     $('btn-again').addEventListener('click', function () {
+      if (countAnswers() > 10 && !window.confirm('Ответы будут стёрты — начать заново?')) { return; }
       state.answers = {};
       persist();
       renderQuiz();
@@ -786,27 +832,84 @@
 
     var remote;
     if (!cfg.statsUrl) {
-      remote = '<div class="fx-empty">Удалённый сбор анонимных итогов владельцем витрины пока не подключён — инструкция лежит в репозитории (BENCHMARK.md). Пока его нет, здесь видна только личная динамика: она хранится в этом браузере и никуда не уходит.</div>';
+      remote = '<div class="fx-empty">Сбор анонимных итогов ещё не открыт — когда откроется, здесь появятся средние по стране. Пока его нет, здесь только личная динамика: она хранится в этом браузере и никуда не уходит.</div>';
     } else {
       remote = '<div class="fx-empty" id="bench-remote">секундочку — тянем агрегаты бенчмарка…</div>';
     }
     body.innerHTML = remote + '<div class="bb-histlocal" id="bench-local"></div>';
 
+    /* v0.4.1: отказ «больше не предлагать» обратим — случайный тап больше
+     * не прячет карточку отправки навсегда. */
+    if (BBTelemetry.isMuted()) {
+      var un = document.createElement('button');
+      un.className = 'bb-linkbtn';
+      un.type = 'button';
+      un.textContent = 'вернуть карточку отправки анонимного итога';
+      un.addEventListener('click', function () {
+        BBTelemetry.unmute();
+        renderBench();
+        toast('карточка отправки возвращена — появится на следующем результате');
+      });
+      body.appendChild(un);
+    }
+
     if (cfg.statsUrl) {
+      /* v0.4.1: таймаут 10 с — коллектор может зависнуть, витрина не должна */
+      var settled = false;
+      var slow = setTimeout(function () {
+        if (settled) { return; }
+        var el0 = $('bench-remote');
+        if (el0) { el0.innerHTML = '<div class="fx-warn"><b>бенчмарк отвечает медленно.</b> Попробуйте обновить страницу позже.</div>'; }
+      }, 10000);
       BBTelemetry.fetchStats(cfg.statsUrl, function (stats) {
+        settled = true;
+        clearTimeout(slow);
         var el = $('bench-remote');
         if (!el) { return; }
-        if (!stats || typeof stats.n !== 'number' || stats.v !== 1) {
+        var safe = bbSan(stats);
+        if (!safe) {
           el.innerHTML = '<div class="fx-warn"><b>бенчмарк не отвечает.</b> Не получилось получить агрегаты — обновите страницу позже.</div>';
           return;
         }
-        el.innerHTML = renderRemoteBench(stats);
+        el.innerHTML = renderRemoteBench(safe);
       });
     }
     renderLocalBench();
   }
 
   function pct(n, total) { return total ? Math.round(100 * n / total) : 0; }
+
+  /* v0.4.1: удалённые агрегаты проходят санитайзер ДО innerHTML —
+   * подменённый или сломанный коллектор не получает DOM-XSS на общем
+   * origin хаба; числа — только из белых диапазонов, строки — через esc(). */
+  function bbNum(x, lo, hi) {
+    var n = typeof x === 'number' && isFinite(x) ? x : parseFloat(x);
+    if (!isFinite(n)) { return null; }
+    return Math.max(lo, Math.min(hi, Math.round(n * 10) / 10));
+  }
+
+  function bbSan(s) {
+    if (!s || s.v !== 1 || typeof s.n !== 'number' || !isFinite(s.n) || s.n < 0) { return null; }
+    s.n = Math.min(Math.floor(s.n), 1000000);
+    ['mean', 'median'].forEach(function (k) { s[k] = bbNum(s[k], 0, 100); });
+    if (s.dist && typeof s.dist === 'object' && !Array.isArray(s.dist)) {
+      ['bad', 'mid', 'good'].forEach(function (k) { s.dist[k] = bbNum(s.dist[k], 0, 1000000) || 0; });
+    } else { s.dist = null; }
+    ['byPkg', 'byRegion', 'byScale', 'byCat'].forEach(function (k) {
+      if (s[k] && typeof s[k] === 'object' && !Array.isArray(s[k])) {
+        Object.keys(s[k]).forEach(function (g) {
+          var o = s[k][g];
+          if (!o || typeof o !== 'object') { delete s[k][g]; return; }
+          o.n = bbNum(o.n, 0, 1000000) || 0;
+          o.mean = bbNum(o.mean, 0, 100);
+        });
+      } else { s[k] = null; }
+    });
+    if (Array.isArray(s.hist)) {
+      s.hist = s.hist.map(function (x) { return bbNum(x, 0, 1000000) || 0; });
+    } else { s.hist = null; }
+    return s;
+  }
 
   function renderRemoteBench(s) {
     if (!s.n) {
@@ -815,9 +918,9 @@
     var h = '<div class="bb-bench-live">';
     h += '<div class="fx-stats">'
       + '<div class="fx-stat">анонимных итогов<b>' + s.n + '</b></div>'
-      + '<div class="fx-stat">средний итог<b>' + fmt(s.mean) + '</b></div>'
-      + '<div class="fx-stat">медиана<b>' + fmt(s.median) + '</b></div>'
-      + '<div class="fx-stat">обновлено<b>' + new Date(s.updated).toLocaleDateString('ru-RU') + '</b></div>'
+      + '<div class="fx-stat">средний итог<b>' + esc(fmt(s.mean)) + '</b></div>'
+      + '<div class="fx-stat">медиана<b>' + esc(fmt(s.median)) + '</b></div>'
+      + '<div class="fx-stat">обновлено<b>' + esc(fmt(s.updated ? new Date(s.updated).toLocaleDateString('ru-RU') : '—')) + '</b></div>'
       + '</div>';
 
     /* светофор по стране */
@@ -847,7 +950,7 @@
       if (!g) { return; }
       var cls = g.mean >= 75 ? 's-good' : (g.mean >= 50 ? 's-mid' : 's-bad');
       var lvl = g.mean >= 75 ? ['good', 'крепко'] : (g.mean >= 50 ? ['mid', 'есть дыры'] : ['bad', 'критично']);
-      h += '<tr><td><b>' + esc(PACKS[id].title) + '</b></td><td>' + g.n + '</td><td><b>' + fmt(g.mean) + '</b></td>'
+      h += '<tr><td><b>' + esc(PACKS[id].title) + '</b></td><td>' + g.n + '</td><td><b>' + esc(fmt(g.mean)) + '</b></td>'
         + '<td><div class="bb-lvcell"><div class="bb-bar"><i class="' + cls + '" style="width:' + g.mean + '%"></i></div>'
         + '<span class="bb-lvl ' + lvl[0] + '">' + lvl[1] + '</span></div></td></tr>';
     });
@@ -857,7 +960,7 @@
       h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>по округам — грубо намеренно: округ не сужает выборку до одиночных хозяйств</caption>'
         + '<thead><tr><th>округ</th><th>итогов</th><th>средний итог</th></tr></thead><tbody>';
       Object.keys(s.byRegion).sort(function (a, b) { return s.byRegion[b].n - s.byRegion[a].n; }).forEach(function (k) {
-        h += '<tr><td><b>' + esc(k) + '</b></td><td>' + s.byRegion[k].n + '</td><td><b>' + fmt(s.byRegion[k].mean) + '</b></td></tr>';
+        h += '<tr><td><b>' + esc(k) + '</b></td><td>' + s.byRegion[k].n + '</td><td><b>' + esc(fmt(s.byRegion[k].mean)) + '</b></td></tr>';
       });
       h += '</tbody></table></div>';
     }
@@ -876,7 +979,7 @@
       h += '<div class="bb-top3"><h4>Самые тонкие барьеры страны — топ-' + weak.length + ' слабых категорий</h4><ol>';
       weak.forEach(function (c) {
         var cat = CATS[c.id] || { t: [c.id, c.id] };
-        h += '<li><b>' + esc(BB.text(cat.t, 0)) + '</b> — в среднем ' + c.mean + '/100 по ' + c.n + ' итогам</li>';
+        h += '<li><b>' + esc(BB.text(cat.t, 0)) + '</b> — в среднем ' + esc(String(c.mean)) + '/100 по ' + c.n + ' итогам</li>';
       });
       h += '</ol></div>';
     }

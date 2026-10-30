@@ -17,7 +17,8 @@
  *  7. ЧЕСТНОСТЬ КОПИРАЙТА: ушедшие из v0.3 обещания «отправки нет»
  *     заменены на opt-in формулировки «по умолчанию».
  *
- * Запуск: node --test tests/   (вместе с bioscore.test.mjs; CI: .github/workflows/ci.yml)
+ * Запуск: node --test tests/*.mjs   (или точечно: tests/bioscore.test.mjs
+ * tests/telemetry.test.mjs; CI: .github/workflows/ci.yml)
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -139,6 +140,18 @@ test('validate: честный payload проходит, мусор отверг
   }
 });
 
+test('validate: ключи cats — строчные id; __proto__ и мусор не проходят', () => {
+  const ok = BBTelemetry.buildPayload(PACKS.mixed, res, {});
+  assert.equal(BBTelemetry.validatePayload({ ...ok, cats: JSON.parse('{"__proto__":1,"arrival":55}') }), false,
+    'own-ключ __proto__ из JSON.parse прошёл в cats');
+  assert.equal(BBTelemetry.validatePayload({ ...ok, cats: JSON.parse('{"НЕ-КЛЮЧ С СИМВОЛАМИ!":55}') }), false,
+    'произвольная строка прошла как id категории');
+  assert.equal(BBTelemetry.validatePayload({ ...ok, cats: JSON.parse('{"Arrival":55}') }), false,
+    'верблюжий регистр прошёл как id категории');
+  assert.equal(BBTelemetry.validatePayload({ ...ok, cats: { arrival: 55, hygiene: 40 } }), true,
+    'честные id не должны отвергаться');
+});
+
 /* ---------- 4. история прогонов: локальная динамика ------------------------ */
 
 test('история: ререндер того же прогона не пишет дубль', () => {
@@ -210,6 +223,11 @@ test('сеть: fetchStats с недоступным URL честно отдаё
   assert.equal(v, null);
 });
 
+test('сеть: JSONP-фолбэк удалён из модуля — удалённый скрипт не исполняется на origin хаба', () => {
+  const src = readFileSync(join(ROOT, 'telemetry.js'), 'utf8');
+  assert.ok(!src.includes('createElement("script"'), 'JSONP жив: script src=statsUrl исполняет произвольный JS');
+});
+
 /* ---------- 7. справочники: вилки и округа ---------------------------------- */
 
 test('справочники: вилки размера есть у всех пакетов, округа — 8 уникальных', () => {
@@ -233,6 +251,7 @@ test('витрина: секция «Бенчмарк России», карто
   assert.ok(html.includes('src="./telemetry-config.js"'), 'конфиг коллектора не подключён');
   assert.ok(html.includes('src="./telemetry.js"'), 'модуль телеметрии не подключён');
   assert.ok(html.includes('renderBench()'), 'рендер бенчмарка не вызывается');
+  assert.ok(html.includes('bbSan('), 'агрегаты коллектора не проходят санитайзер до innerHTML');
 });
 
 test('витрина: opt-in карточка и секция бенчмарка не печатаются в PDF', () => {
@@ -251,6 +270,9 @@ test('коллектор: scripts/collector.gs — doPost, doGet, JSONP и setup
   assert.ok(gs.includes('callback'), 'нет JSONP-страховки');
   assert.ok(/function setup/.test(gs), 'нет setup() для создания листа');
   assert.ok(gs.includes('submissions'), 'коллектор пишет не в тот лист');
+  assert.ok(/MIN_N/.test(gs), 'нет порога малых групп — k-анонимность на сервере');
+  assert.ok(/DAY_LIMIT/.test(gs), 'нет суточного лимита отправок — бот выжигает таблицу');
+  assert.ok(/CAT_ID_RE/.test(gs), 'ключи cats не проверяются по шаблону на сервере');
 });
 
 /* ---------- 9. честность копирайта: opt-in назван opt-in -------------------- */

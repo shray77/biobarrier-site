@@ -10,7 +10,8 @@
  *    округ и размер (по желанию), итог 0–100 и баллы категорий. Итог
  *    округляется до целого, дата — до дня (бакетинг ради k-анонимности);
  *    сами ответы, режим языка и тексты анкеты не отправляются вовсе;
- *  - ЧЕСТНЫЙ КОНТРАКТ: validatePayload — белый список ключей и значений;
+ *  - ЧЕСТНЫЙ КОНТРАКТ: validatePayload — белый список ключей и значений,
+ *    включая шаблон id категорий (строчные латинские, без __proto__);
  *    та же проверка продублирована на коллекторе (scripts/collector.gs),
  *    откуда данные читает витрина «Бенчмарк России»;
  *  - ИСТОРИЯ ПРОГОНОВ — локальная (localStorage, только итоги, без
@@ -56,6 +57,9 @@
   };
 
   var KEYS = ["v", "pkg", "ts", "total", "band", "region", "scale", "cats", "ans", "out"];
+  /* id категорий — строчные латинские буквы/цифры до 12 знаков:
+   * отсекает __proto__/constructor и мусорные ключи на обеих сторонах. */
+  var CAT_ID_RE = /^[a-z][a-z0-9]{1,11}$/;
 
   /* ---- хранилище: браузер или памятиный шим (тесты) ---------------------- */
 
@@ -129,6 +133,7 @@
     if (!isPlainObject(p.cats) || Object.keys(p.cats).length < 1 || Object.keys(p.cats).length > 40) { return false; }
     var catIds = Object.keys(p.cats);
     for (var i = 0; i < catIds.length; i += 1) {
+      if (!CAT_ID_RE.test(catIds[i])) { return false; }
       var v = p.cats[catIds[i]];
       if (typeof v !== "number" || !isFinite(v) || v < 0 || v > 100) { return false; }
     }
@@ -155,33 +160,22 @@
     }).then(function () { done(true); }, function () { done(false); });
   }
 
-  /* ---- чтение агрегатов: fetch, при CORS-обиде — JSONP --------------------- */
+  /* ---- чтение агрегатов: fetch; при обиде — честный null --------------------
+   *
+   * v0.4.1: JSONP-фолбэк удалён. Причина — безопасность: исполнение
+   * удалённого скрипта на общем origin хаба (shray77.github.io) — это
+   * XSS-поверхность на все проекты сразу; Apps Script после редиректа
+   * отдаёт Access-Control-Allow-Origin: *, так что обычного fetch
+   * достаточно. Ошибка сети = null, витрина скажет «не отвечает». */
 
   function fetchStats(url, done) {
     done = done || function () {};
     if (!url) { done(null); return; }
-    if (typeof root.fetch === "function") {
-      root.fetch(url, { cache: "no-store" }).then(function (r) {
-        if (!r.ok) { throw new Error("http " + r.status); }
-        return r.json();
-      }).then(function (j) { done(j); }, function () { jsonp(url, done); });
-      return;
-    }
-    jsonp(url, done);
-  }
-
-  function jsonp(url, done) {
-    if (typeof document === "undefined") { done(null); return; }
-    var cb = "bbtb" + Date.now() + Math.floor(Math.random() * 1e6);
-    var s = document.createElement("script");
-    var clean = function () { try { s.remove(); } catch (e) {} };
-    root[cb] = function (data) {
-      try { delete root[cb]; } catch (e) { root[cb] = undefined; }
-      clean(); done(data);
-    };
-    s.onerror = function () { try { delete root[cb]; } catch (e) { root[cb] = undefined; } clean(); done(null); };
-    s.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "callback=" + cb;
-    document.head.appendChild(s);
+    if (typeof root.fetch !== "function") { done(null); return; }
+    root.fetch(url, { cache: "no-store" }).then(function (r) {
+      if (!r.ok) { throw new Error("http " + r.status); }
+      return r.json();
+    }).then(function (j) { done(j); }, function () { done(null); });
   }
 
   /* ---- история прогонов: локальная динамика, без ответов ------------------- */
