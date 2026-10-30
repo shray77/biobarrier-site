@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>БиоБарьер — скоринг биобезопасности хозяйства</title>
-<meta name="description" content="Анкета биобезопасности на 0–100: семь пакетов — птица, свиньи, молочный КРС, откорм КРС, овцы и козы, перепела и мелкое смешанное хозяйство (ЛПХ). Два режима языка: владелец и профессионал. Зарубежные бенчмарки Biocheck.UGent и топ-3 слабых блоков «что чинить первым». Офлайн, данные не покидают браузер.">
+<meta name="description" content="Анкета биобезопасности на 0–100: семь пакетов — птица, свиньи, молочный КРС, откорм КРС, овцы и козы, перепела и мелкое смешанное хозяйство (ЛПХ). Два режима языка: владелец и профессионал. Зарубежные бенчмарки Biocheck.UGent и топ-3 слабых блоков «что чинить первым». Считает в браузере; по желанию — анонимный итог в первый русский бенчмарк (opt-in).">
 <meta property="og:title" content="БиоБарьер — скоринг биобезопасности хозяйства">
-<meta property="og:description" content="Риск-ориентированная анкета 0–100 с бенчмарками Biocheck.UGent: птица, свиньи, молочный КРС, откорм, овцы и козы, перепела — и впервые мелкое смешанное хозяйство.">
+<meta property="og:description" content="Риск-ориентированная анкета 0–100 с бенчмарками Biocheck.UGent: птица, свиньи, молочный КРС, откорм, овцы и козы, перепела — и впервые мелкое смешанное хозяйство. По желанию итог уходит в анонимный русский бенчмарк (opt-in).">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://shray77.github.io/biobarrier-site/">
 <meta name="twitter:card" content="summary">
@@ -165,6 +165,42 @@
   .bb-top3 li b { color: var(--text); }
   .bb-top3 li .bb-adv { display: block; font-size: 12.5px; color: var(--faint); margin-top: 2px; }
 
+  /* -- v0.4: бенчмарк России (opt-in) -------------------------------------- */
+  .bb-share { border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    border-radius: var(--ds-radius-s); padding: 12px 14px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .bb-share h4 { margin: 0 0 6px; font: 600 13px var(--ds-font-sans); color: var(--text); }
+  .bb-share p { margin: 0 0 8px; }
+  .bb-share .bb-share-list { margin: 0 0 8px; padding-left: 18px; }
+  .bb-share .bb-share-list li { margin: 3px 0; }
+  .bb-share b { color: var(--text); }
+  .bb-share-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin: 10px 0; }
+  .bb-share-controls label { font: 500 11px var(--mono); color: var(--faint); display: flex; flex-direction: column; gap: 4px; }
+  .bb-share-controls select { font: 500 12.5px var(--mono); color: var(--text); background: var(--surface2);
+    border: 1px solid var(--border); border-radius: var(--ds-radius-s); padding: 6px 8px; max-width: 200px; }
+  .bb-share-done { font: 600 12.5px var(--mono); color: var(--green); margin: 0; }
+  .bb-share-err { font: 600 12.5px var(--mono); color: var(--amber); margin: 0; }
+  .bb-linkbtn { background: none; border: none; padding: 0; font: 500 11px var(--mono); color: var(--faint);
+    cursor: pointer; text-decoration: underline dotted; }
+  .bb-linkbtn:hover { color: var(--muted); }
+
+  .bb-bench-live .fx-stats { margin: 10px 0; }
+  .bb-dist-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+  .bb-dist-row .bb-bar { flex: 1; }
+  .bb-dist-row > b { font: 600 12px var(--mono); color: var(--text); white-space: nowrap; }
+  .bb-hist { display: flex; gap: 4px; align-items: flex-end; margin: 12px 0 2px; }
+  .bb-hist-col { flex: 1; height: 44px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .bb-hist-col i { display: block; background: color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 2px 2px 0 0; }
+  .bb-hist-col span { font: 500 8.5px var(--mono); color: var(--faint); text-align: center; margin-top: 3px; }
+  .bb-histlocal h4 { margin: 14px 0 2px; font: 600 13px var(--ds-font-sans); color: var(--text); }
+  .bb-histlocal p { margin: 2px 0 6px; font-size: 12px; color: var(--faint); }
+  .bb-runs { list-style: none; margin: 6px 0 0; padding: 0; font: 12.5px var(--mono); }
+  .bb-runs li { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--border); color: var(--muted); }
+  .bb-runs li:last-child { border-bottom: none; }
+  .bb-runs li b { color: var(--text); }
+  .bb-runs .bb-runs-date { color: var(--faint); font-size: 11px; }
+  .bb-bench-note { font: 11.5px var(--mono); color: var(--faint); margin: 8px 0 0; }
+
   /* -- методология: голос периодики ---------------------------------------- */
   article.doc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--ds-radius); padding: var(--ds-space-4) var(--ds-space-5); margin: 16px 0; }
   article.doc p { margin: 8px 0; color: var(--muted); }
@@ -196,9 +232,9 @@
   @media print {
     /* светофор обязан попадать в PDF: браузер по умолчанию выбрасывает фоны */
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .ds-hub, .bb-ctrl, .fx-actions, .theme-pill, .bb-actions, .sub, .bb-pack, .bb-privacy,
+    .ds-hub, .bb-ctrl, .fx-actions, .theme-pill, .bb-actions, .sub, .bb-pack, .bb-privacy, .bb-share,
     .ds-masthead__sub, .ds-masthead__side, .ds-masthead-meta, .ds-rule-double,
-    #quiz, #method, #pick { display: none !important; }
+    #quiz, #method, #pick, #bench { display: none !important; }
     .bb-print-note { display: block; font: 500 9.5px var(--mono); color: var(--ds-muted, #666); margin: 0 0 6px; }
     .bb-lvl { border-style: solid; }
     .fx-scalewrap { max-width: 400px; margin: 6px 0 0; padding-top: 4px; }
@@ -248,18 +284,18 @@
 
 <header class="ds-masthead">
   <div class="wrap">
-    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.3</span></div>
+    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.4</span></div>
   </div>
   <div class="wrap ds-masthead__row">
     <div class="ds-masthead__brand">
       <div class="ds-masthead__logo"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <div>
         <h1 class="ds-masthead__title">БиоБарьер — скоринг биобезопасности хозяйства</h1>
-        <p class="ds-masthead__sub">Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит анкету и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела. Считает в браузере — ответы не покидают устройство; это зеркало для хозяина, а не проверка.</p>
+        <p class="ds-masthead__sub">Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит анкету и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела. Считает в браузере — ответы не покидают устройство, делиться можно только анонимным итогом; это зеркало для хозяина, а не проверка.</p>
       </div>
     </div>
     <div class="ds-masthead__side">
-      <div class="live" id="meta"><span class="dot ok"></span><span>офлайн · без отправки данных</span></div>
+      <div class="live" id="meta"><span class="dot ok"></span><span>офлайн · отправка — только вашей кнопкой</span></div>
       <button class="ds-btn ds-btn--sm ds-theme-toggle ds-theme-toggle--labeled theme-pill" id="themeToggle" aria-label="Переключить тему" title="Переключить тему">
         <svg class="ds-theme-toggle__sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg>
         <svg class="ds-theme-toggle__moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -285,7 +321,7 @@
     <p class="sub" id="quiz-sub"></p>
     <div class="bb-privacy">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-      <p><b>Зеркало, а не проверка.</b> Ответы считаются и хранятся только в этом браузере: сервера нет, отправки нет, никто не увидит. Отвечайте «как есть» — низкий балл не признание, а план улучшения. Неохотный вопрос можно пропустить: пропуски не штрафуются, а просто выпадают из расчёта.</p>
+      <p><b>Зеркало, а не проверка.</b> Ответы считаются и хранятся только в этом браузере: по умолчанию ничего не отправляется. Поделиться можно только анонимным итогом — одной кнопкой на экране результата. Отвечайте «как есть» — низкий балл не признание, а план улучшения. Неохотный вопрос можно пропустить: пропуски не штрафуются, а просто выпадают из расчёта.</p>
     </div>
     <div class="bb-ctrl">
       <div class="bb-mode" role="radiogroup" aria-label="Режим языка">
@@ -308,6 +344,13 @@
     <div class="fx-res" id="res-body" aria-live="polite"></div>
   </section>
 
+  <!-- ======================= БЕНЧМАРК РОССИИ (v0.4, opt-in) ================ -->
+  <section class="fx" id="bench">
+    <h2>Бенчмарк России</h2>
+    <p class="sub">Своих средних по биобезопасности в стране не обмерял никто — проект собирает первый русский бенчмарк: только добровольные анонимные итоги, включая ЛПХ.</p>
+    <div id="bench-body" aria-live="polite"></div>
+  </section>
+
   <!-- ======================= МЕТОДОЛОГИЯ (голос A «Периодика») ============ -->
   <section class="fx" id="method">
     <h2>Методология</h2>
@@ -323,7 +366,7 @@
       <p>Пропущенные вопросы исключаются из расчёта честно: и из числителя, и из знаменателя — но итог честнее заполнять целиком, о пропусках результат предупреждает. Внешний блок («занос») и внутренний («внутри хозяйства») агрегируются отдельно по своим категориям. Веса категорий заданы профилем пакета: у птицы поднят вес грызунов и дикой птицы (грипп птиц), у свиней — перевозок (АЧС), у молочного КРС — доения; сумма весов каждого пакета равна 100 и гейтится автотестами.</p>
 
       <h2>Бенчмарки — зарубежные, и это честно сказано</h2>
-      <p>Сравнение — с опубликованными средними Biocheck.UGent по чужим странам; в России биобезопасность ферм систематически не обмерялась, своих бенчмарков нет. Для мелких смешанных дворов (ЛПХ), откорма КРС, мелких жвачных и перепелов бенчмарка не существует нигде в мире — Biocheck делает анкеты только для коммерческих производств. Поэтому там, где сравнивать не с чем, работает светофор уровней.</p>
+      <p>Сравнение — с опубликованными средними Biocheck.UGent по чужим странам; в России биобезопасность ферм систематически не обмерялась, своих бенчмарков нет. Для мелких смешанных дворов (ЛПХ), откорма КРС, мелких жвачных и перепелов бенчмарка не существует нигде в мире — Biocheck делает анкеты только для коммерческих производств. Поэтому там, где сравнивать не с чем, работает светофор уровней. Свои средние теперь собираются: с v0.4 любой может отправить анонимный итог одной кнопкой, и по мере набора выборки секция «Бенчмарк России» выше превращается из обещания в данные — впервые в мире, в том числе для ЛПХ.</p>
       <div class="tbl-scroll"><table class="spec">
         <caption>источники бенчмарков витрины</caption>
         <thead><tr><th>пакет</th><th>бенчмарк</th><th>значения</th><th>источник</th></tr></thead>
@@ -343,11 +386,11 @@
         <li><b>Это самооценка, а не аудит.</b> Анкету заполняет человек по своим наблюдениям; намеренное или случайное приукрашивание инструмент не ловит.</li>
         <li><b>Веса — редакционные.</b> Профили весов собраны по логике рисков и публикациям Biocheck, но не прошли российскую полевую валидацию. Читайте разрезы, а не десятую долю балла.</li>
         <li><b>Скор не заменяет ветеринара.</b> Он показывает, где барьеры тонкие; конкретные меры назначает специалист по вашему хозяйству.</li>
-        <li><b>Приватность.</b> Ответы хранятся только в вашем браузере (localStorage); сервера нет, отчёт никуда не отправляется.</li>
+        <li><b>Приватность.</b> Ответы хранятся только в вашем браузере (localStorage); по умолчанию ничего не отправляется. Единственная отправка — анонимный итог по вашей кнопке: без имени, контактов и идентификаторов устройства (см. «Бенчмарк России» и <a href="./terms.html">условия</a>).</li>
       </ul>
 
       <h2>План расширения</h2>
-      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. Дальше: если пойдёт сбор анонимных результатов — первый в мире русский бенчмарк, в том числе для ЛПХ. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
+      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. v0.4 — бенчмарк России: opt-in отправка анонимного итога одной кнопкой (тип хозяйства, итог и разрез категорий, по желанию округ и размер поголовья), витрина агрегатов «Бенчмарк России» и личная динамика прогонов. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
       </article>
     </details>
   </section>
@@ -356,7 +399,7 @@
 <footer class="ds-footer ds-footer--meta">
   <div class="wrap">
     <span class="legal">самооценка биобезопасности · не аудит и не ветеринарная консультация · бенчмарки — зарубежные публикации · <a href="./terms.html">условия и дисклеймер</a></span>
-    <span>v0.3 · подход — риск-ориентированный скоринг по мотивам Biocheck.UGent · арифметика гейтится известными ответами (node --test)</span>
+    <span>v0.4 · подход — риск-ориентированный скоринг по мотивам Biocheck.UGent · бенчмарк России — opt-in, анонимно · арифметика и payload гейтятся известными ответами (node --test)</span>
     <span>источники: <a href="https://www.biocheckgent.com/en/about-us/how-our-checklists-are-built">Biocheck.UGent</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7597688">бройлеры, Филиппины</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4359795">свиньи, Швеция</a> · <a href="https://link.springer.com/article/10.1186/s40813-018-0113-6">свиньи, Ирландия</a> · <a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815220300174">КРС</a> · ядро — <a href="https://github.com/shray77/vet-ds">vet-ds</a> · <a href="https://github.com/shray77/biobarrier-site">репозиторий</a></span>
   </div>
 </footer>
@@ -370,6 +413,8 @@
 <script src="./data-smallrum.js"></script>
 <script src="./data-quail.js"></script>
 <script src="./bioscore.js"></script>
+<script src="./telemetry-config.js"></script>
+<script src="./telemetry.js"></script>
 <script>
 (function () {
   'use strict';
@@ -591,7 +636,7 @@
     }
 
     var v = res.level;
-    h += '<div class="bb-print-note">БиоБарьер · ' + new Date().toLocaleDateString('ru-RU') + ' · распечатано для себя: данные не покидали браузер и никуда не отправлялись</div>';
+    h += '<div class="bb-print-note">БиоБарьер · ' + new Date().toLocaleDateString('ru-RU') + ' · распечатано для себя: расчёт — в браузере, без сервера</div>';
     h += '<div class="fx-verdict"><span class="fx-big">' + res.total + '<small style="font-size:18px;color:var(--faint)">/100</small></span>'
        + '<span class="' + (LEVEL_CLS[v.code] || '') + '">' + v.label + '</span>'
        + '<span class="fx-ci">' + v.why + '</span></div>';
@@ -641,15 +686,23 @@
       h += '</ol></div>';
     }
 
-    h += '<p class="fx-thrline">' + esc(p.title) + ' · ' + esc(p.sub) + ' · шкала 0–100, выше — лучше: критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75 · самооценка, не аудит · данные не покидают браузер</p>';
+    h += '<p class="fx-thrline">' + esc(p.title) + ' · ' + esc(p.sub) + ' · шкала 0–100, выше — лучше: критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75 · самооценка, не аудит · ответы остаются в этом браузере</p>';
     h += '<div class="fx-actions" id="res-actions">'
        + '<button class="ds-btn ds-btn--primary" id="btn-copy" type="button">скопировать итог</button>'
        + '<button class="ds-btn" id="btn-print" type="button">печать / PDF</button>'
        + '<button class="ds-btn" id="btn-again" type="button">пройти заново</button>'
        + '</div>';
+    h += '<div id="share-host"></div>';
 
     out.innerHTML = h;
     $('result').hidden = false;
+
+    /* v0.4: локальная история прогонов + opt-in отправка анонимного итога */
+    if (window.BBTelemetry) {
+      BBTelemetry.pushRun({ ts: BBTelemetry.todayISO(), pkg: state.pack, total: res.total, band: res.level.code });
+      renderShareCard(p, res);
+      renderBench();
+    }
 
     $('btn-copy').addEventListener('click', function () {
       var txt = BB.reportText(p, res, CATS, state.mode);
@@ -666,6 +719,201 @@
       $('result').hidden = true;
       try { $('quiz').scrollIntoView({ behavior: 'smooth' }); } catch (e) {}
     });
+  }
+
+  /* ---- v0.4: opt-in отправка анонимного итога в бенчмарк ------------------- */
+  function telemetryCfg() { return globalThis.BB_TELEMETRY || {}; }
+
+  function renderShareCard(p, res) {
+    var host = $('share-host');
+    if (!host || !window.BBTelemetry) { return; }
+    var cfg = telemetryCfg();
+    if (!cfg.submitUrl || BBTelemetry.isMuted() || res.total === null) { host.innerHTML = ''; return; }
+
+    var scales = BBTelemetry.SCALES[p.id] || {};
+    var regionOpts = '<option value="">не указывать</option>'
+      + BBTelemetry.REGIONS.map(function (r) { return '<option value="' + r + '">' + r + '</option>'; }).join('');
+    var scaleOpts = '<option value="">не указывать</option>'
+      + [['s', scales.s], ['m', scales.m], ['l', scales.l]].filter(function (x) { return x[1]; })
+          .map(function (x) { return '<option value="' + x[0] + '">' + esc(x[1]) + '</option>'; }).join('');
+
+    host.innerHTML = ''
+      + '<div class="bb-share" id="share-card">'
+      + '<h4>Первый русский бенчмарк строится из таких итогов — как ваш</h4>'
+      + '<p>Средних по биобезопасности в России не обмерял никто — ни для ферм, ни тем более для ЛПХ. Один анонимный итог — один камень в фундамент. Уходят только:</p>'
+      + '<ul class="bb-share-list"><li>тип хозяйства, итог 0–100 и баллы категорий;</li>'
+      + '<li>регион (округ) и размер поголовья — если укажете.</li></ul>'
+      + '<p><b>Не уходят никогда:</b> имя и контакты (их негде взять), идентификаторы устройства, сами ответы и тексты анкеты. Связать итог с конкретным хозяйством невозможно.</p>'
+      + '<div class="bb-share-controls">'
+      + '<label>регион<select id="share-region">' + regionOpts + '</select></label>'
+      + '<label>поголовье<select id="share-scale">' + scaleOpts + '</select></label>'
+      + '<button class="ds-btn ds-btn--primary ds-btn--sm" id="share-send" type="button">отправить анонимный итог</button>'
+      + '</div>'
+      + '<button class="bb-linkbtn" id="share-mute" type="button">больше не предлагать</button>'
+      + '<span class="bb-bench-note">одна кнопка — один итог; детали анонимности — в <a href="./terms.html">условиях</a></span>'
+      + '</div>';
+
+    $('share-send').addEventListener('click', function () {
+      var btn = $('share-send');
+      btn.disabled = true;
+      var opts = {
+        region: $('share-region').value || null,
+        scale: $('share-scale').value || null
+      };
+      var payload = BBTelemetry.buildPayload(p, res, opts);
+      BBTelemetry.submit(telemetryCfg().submitUrl, payload, function (ok) {
+        var card = $('share-card');
+        if (!card) { return; }
+        card.innerHTML = ok
+          ? '<p class="bb-share-done">Спасибо — итог учтён. Бенчмарк на главной обновится по мере набора.</p>'
+          : '<p class="bb-share-err">Не получилось отправить — связь капризна. Итог никуда не ушёл, можно попробовать позже.</p>';
+      });
+    });
+    $('share-mute').addEventListener('click', function () {
+      BBTelemetry.mute();
+      host.innerHTML = '';
+      toast('хорошо — больше не предлагаем');
+    });
+  }
+
+  /* ---- v0.4: витрина «Бенчмарк России» -------------------------------------- */
+  var PACK_ORDER = ['mixed', 'poultry', 'pigs', 'dairy', 'beef', 'smallrum', 'quail'];
+
+  function renderBench() {
+    var body = $('bench-body');
+    if (!body || !window.BBTelemetry) { return; }
+    var cfg = telemetryCfg();
+
+    var remote;
+    if (!cfg.statsUrl) {
+      remote = '<div class="fx-empty">Удалённый сбор анонимных итогов владельцем витрины пока не подключён — инструкция лежит в репозитории (BENCHMARK.md). Пока его нет, здесь видна только личная динамика: она хранится в этом браузере и никуда не уходит.</div>';
+    } else {
+      remote = '<div class="fx-empty" id="bench-remote">секундочку — тянем агрегаты бенчмарка…</div>';
+    }
+    body.innerHTML = remote + '<div class="bb-histlocal" id="bench-local"></div>';
+
+    if (cfg.statsUrl) {
+      BBTelemetry.fetchStats(cfg.statsUrl, function (stats) {
+        var el = $('bench-remote');
+        if (!el) { return; }
+        if (!stats || typeof stats.n !== 'number' || stats.v !== 1) {
+          el.innerHTML = '<div class="fx-warn"><b>бенчмарк не отвечает.</b> Не получилось получить агрегаты — обновите страницу позже.</div>';
+          return;
+        }
+        el.innerHTML = renderRemoteBench(stats);
+      });
+    }
+    renderLocalBench();
+  }
+
+  function pct(n, total) { return total ? Math.round(100 * n / total) : 0; }
+
+  function renderRemoteBench(s) {
+    if (!s.n) {
+      return '<div class="fx-empty">Пока 0 ответов — бенчмарк начнётся с вашего. Пройдите анкету и нажмите «отправить анонимный итог» на экране результата.</div>';
+    }
+    var h = '<div class="bb-bench-live">';
+    h += '<div class="fx-stats">'
+      + '<div class="fx-stat">анонимных итогов<b>' + s.n + '</b></div>'
+      + '<div class="fx-stat">средний итог<b>' + fmt(s.mean) + '</b></div>'
+      + '<div class="fx-stat">медиана<b>' + fmt(s.median) + '</b></div>'
+      + '<div class="fx-stat">обновлено<b>' + new Date(s.updated).toLocaleDateString('ru-RU') + '</b></div>'
+      + '</div>';
+
+    /* светофор по стране */
+    var distRows = [['bad', 'критично'], ['mid', 'есть дыры'], ['good', 'крепко']].map(function (pair) {
+      var c = s.dist ? (s.dist[pair[0]] || 0) : 0;
+      return '<div class="bb-dist-row"><span class="bb-lvl ' + pair[0] + '">' + pair[1] + '</span>'
+        + '<div class="bb-bar"><i class="s-' + pair[0] + '" style="width:' + pct(c, s.n) + '%"></i></div>'
+        + '<b>' + c + ' · ' + pct(c, s.n) + '%</b></div>';
+    }).join('');
+    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>распределение итогов по светофору · выше — лучше</caption><tbody>' + distRows + '</tbody></table></div>';
+
+    /* гистограмма по десяткам */
+    h += '<div class="bb-hist" role="img" aria-label="распределение итогов по десяткам баллов">';
+    var maxB = Math.max.apply(null, (s.hist || [0]).concat([1]));
+    for (var b = 0; b < 10; b += 1) {
+      var c = (s.hist && s.hist[b]) || 0;
+      h += '<div class="bb-hist-col"><i style="height:' + Math.round(100 * c / maxB) + '%"></i>'
+        + '<span>' + (b * 10) + '–' + (b * 10 + 9) + '</span></div>';
+    }
+    h += '</div>';
+
+    /* разрезы: по типам хозяйств — включая ЛПХ */
+    h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>по типам хозяйств — включая ЛПХ, для которых бенчмарка нет нигде в мире</caption>'
+      + '<thead><tr><th>хозяйство</th><th>итогов</th><th>средний итог</th><th style="width:34%">уровень</th></tr></thead><tbody>';
+    PACK_ORDER.forEach(function (id) {
+      var g = s.byPkg && s.byPkg[id];
+      if (!g) { return; }
+      var cls = g.mean >= 75 ? 's-good' : (g.mean >= 50 ? 's-mid' : 's-bad');
+      var lvl = g.mean >= 75 ? ['good', 'крепко'] : (g.mean >= 50 ? ['mid', 'есть дыры'] : ['bad', 'критично']);
+      h += '<tr><td><b>' + esc(PACKS[id].title) + '</b></td><td>' + g.n + '</td><td><b>' + fmt(g.mean) + '</b></td>'
+        + '<td><div class="bb-lvcell"><div class="bb-bar"><i class="' + cls + '" style="width:' + g.mean + '%"></i></div>'
+        + '<span class="bb-lvl ' + lvl[0] + '">' + lvl[1] + '</span></div></td></tr>';
+    });
+    h += '</tbody></table></div>';
+
+    if (s.byRegion && Object.keys(s.byRegion).length) {
+      h += '<div class="tbl-scroll"><table class="bb-cats-tbl"><caption>по округам — грубо намеренно: округ не сужает выборку до одиночных хозяйств</caption>'
+        + '<thead><tr><th>округ</th><th>итогов</th><th>средний итог</th></tr></thead><tbody>';
+      Object.keys(s.byRegion).sort(function (a, b) { return s.byRegion[b].n - s.byRegion[a].n; }).forEach(function (k) {
+        h += '<tr><td><b>' + esc(k) + '</b></td><td>' + s.byRegion[k].n + '</td><td><b>' + fmt(s.byRegion[k].mean) + '</b></td></tr>';
+      });
+      h += '</tbody></table></div>';
+    }
+
+    /* самые тонкие барьеры страны: топ-5 слабых категорий (порог n ≥ 5) */
+    var weak = [];
+    if (s.byCat) {
+      Object.keys(s.byCat).forEach(function (cid) {
+        var g = s.byCat[cid];
+        if (g && g.n >= 5) { weak.push({ id: cid, mean: g.mean, n: g.n }); }
+      });
+      weak.sort(function (a, b) { return a.mean - b.mean; });
+      weak = weak.slice(0, 5);
+    }
+    if (weak.length) {
+      h += '<div class="bb-top3"><h4>Самые тонкие барьеры страны — топ-' + weak.length + ' слабых категорий</h4><ol>';
+      weak.forEach(function (c) {
+        var cat = CATS[c.id] || { t: [c.id, c.id] };
+        h += '<li><b>' + esc(BB.text(cat.t, 0)) + '</b> — в среднем ' + c.mean + '/100 по ' + c.n + ' итогам</li>';
+      });
+      h += '</ol></div>';
+    }
+
+    h += '<p class="bb-bench-note">выборка добровольная: это первая честная картина, а не «норма» · самооценка, не аудит · наружу смотрят только агрегаты — строк в выдаче нет</p>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderLocalBench() {
+    var el = $('bench-local');
+    if (!el) { return; }
+    var hist = window.BBTelemetry ? BBTelemetry.getHistory() : [];
+    if (!hist.length) { el.innerHTML = ''; return; }
+    var runs = hist.slice().reverse();
+    var mean = 0;
+    runs.forEach(function (r) { mean += r.total; });
+    mean = Math.round(mean / runs.length);
+    var h = '<h4>ваши прогоны — только в этом браузере</h4>'
+      + '<p>итогов: ' + runs.length + ' · средний ' + mean + '/100 · хранятся без ответов, одной кнопкой ниже стираются</p>'
+      + '<ul class="bb-runs">';
+    runs.forEach(function (r) {
+      var lvl = r.band === 'good' ? ['good', 'крепко'] : (r.band === 'mid' ? ['mid', 'есть дыры'] : ['bad', 'критично']);
+      h += '<li><b>' + r.total + '</b><span>/100</span><span>' + esc((PACKS[r.pkg] || { title: r.pkg }).title) + '</span>'
+        + '<span class="bb-runs-date">' + esc(r.ts) + '</span>'
+        + '<span class="bb-lvl ' + lvl[0] + '">' + lvl[1] + '</span></li>';
+    });
+    h += '</ul><button class="bb-linkbtn" id="bench-clear" type="button">очистить историю прогонов</button>';
+    el.innerHTML = h;
+    var clr = $('bench-clear');
+    if (clr) {
+      clr.addEventListener('click', function () {
+        BBTelemetry.clearHistory();
+        renderLocalBench();
+        toast('история прогонов стёрта — была только в этом браузере');
+      });
+    }
   }
 
   function fallbackCopy(txt, done) {
@@ -690,6 +938,7 @@
 
   /* ---- старт ------------------------------------------------------------------ */
   renderPacks();
+  renderBench();
   if (state.pack && PACKS[state.pack]) {
     var savedMode = state.mode;
     Array.prototype.forEach.call(document.querySelectorAll('input[name="bb-mode"]'), function (r) {
