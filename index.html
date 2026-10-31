@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>БиоБарьер — проверка биобезопасности хозяйства по баллам 0–100</title>
-<meta name="description" content="Анкета биобезопасности на 0–100: семь пакетов — птица, свиньи, молочный КРС, откорм КРС, овцы и козы, перепела и мелкое смешанное хозяйство (ЛПХ). Два режима языка: владелец и профессионал. Зарубежные бенчмарки Biocheck.UGent и топ-3 слабых блоков «что чинить первым». Считает в браузере; по желанию — анонимный итог в первый русский бенчмарк (opt-in).">
+<meta name="description" content="Анкета биобезопасности на 0–100: семь пакетов — птица, свиньи, молочный КРС, откорм КРС, овцы и козы, перепела и мелкое смешанное хозяйство (ЛПХ). Два режима языка: владелец и профессионал. Зарубежные бенчмарки Biocheck.UGent и топ-3 слабых блоков «что чинить первым». Для ЛПХ — быстрый скрининг: 12 красных флагов двора за две минуты. Считает в браузере; по желанию — анонимный итог в первый русский бенчмарк (opt-in).">
 <meta property="og:title" content="БиоБарьер — проверка биобезопасности хозяйства по баллам 0–100">
-<meta property="og:description" content="Риск-ориентированная анкета 0–100 с бенчмарками Biocheck.UGent: птица, свиньи, молочный КРС, откорм, овцы и козы, перепела — и впервые мелкое смешанное хозяйство. По желанию итог уходит в анонимный русский бенчмарк (opt-in).">
+<meta property="og:description" content="Риск-ориентированная анкета 0–100 с бенчмарками Biocheck.UGent: птица, свиньи, молочный КРС, откорм, овцы и козы, перепела — и впервые мелкое смешанное хозяйство. Для ЛПХ — быстрый скрининг: 12 красных флагов двора. По желанию итог уходит в анонимный русский бенчмарк (opt-in).">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://shray77.github.io/biobarrier-site/">
 <meta property="og:image" content="https://shray77.github.io/biobarrier-site/og.png">
@@ -59,6 +59,23 @@
   .bb-pack .bb-pack-sub { margin: 0; font-size: 12.5px; color: var(--muted); }
   .bb-pack .bb-pack-meta { margin: 2px 0 0; font: 500 11px var(--mono); color: var(--faint); }
   .bb-pack .bb-pack-about { margin: 0; font-size: 12px; color: var(--muted); }
+
+  /* -- v0.5: скрининг «красные флаги двора» ------------------------------- */
+  .bb-screen-strip { display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    border-radius: var(--ds-radius); padding: 12px 16px; margin: 12px 0 0; }
+  .bb-screen-strip svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+  .bb-screen-strip .bb-screen-txt { flex: 1 1 320px; margin: 0; font-size: 13px; color: var(--muted); }
+  .bb-screen-strip .bb-screen-txt b { color: var(--text); }
+  .fx-flags { margin: 14px 0 4px; }
+  .fx-flags h4 { margin: 0 0 8px; font: 600 13px var(--ds-font-sans); color: var(--text); }
+  .fx-flags ol { margin: 0; padding-left: 20px; }
+  .fx-flags li { margin: 8px 0; font-size: 13.5px; color: var(--muted); }
+  .fx-flags li b { color: var(--text); }
+  .fx-flags li .bb-adv { display: block; font-size: 12.5px; color: var(--faint); margin-top: 2px; }
+  .fx-flags li .bb-whyline { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .fx-edge { font: 500 12px var(--mono); color: var(--amber); margin: 6px 0 0; }
 
   /* -- анкета --------------------------------------------------------------- */
   .bb-ctrl { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px;
@@ -268,6 +285,7 @@
     .bb-cats-tbl th { font-size: 9px; padding: 3px 6px; }
     .bb-cats-tbl td { padding: 4px 6px; }
     .bb-top3 li { font-size: 11px; }
+    .fx-flags li { font-size: 11px; }
     footer { margin-top: 8px; padding: 6px 0 0; }
     .ds-footer--meta .wrap span:not(.legal) { display: none; }
     footer .legal { font-size: 9.5px; }
@@ -292,14 +310,14 @@
 
 <header class="ds-masthead">
   <div class="wrap">
-    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.4.1</span></div>
+    <div class="ds-masthead-meta"><span>biobarrier · полевой инструмент профилактики</span><span class="m-date">онлайн · v0.5</span></div>
   </div>
   <div class="wrap ds-masthead__row">
     <div class="ds-masthead__brand">
       <div class="ds-masthead__logo"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <div>
         <h1 class="ds-masthead__title">БиоБарьер — скоринг биобезопасности хозяйства</h1>
-        <p class="ds-masthead__sub">Считает в браузере — ответы не покидают устройство; это зеркало для хозяина, а не проверка. Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит её и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела.</p>
+        <p class="ds-masthead__sub">Считает в браузере — ответы не покидают устройство; это зеркало для хозяина, а не проверка. Анкета на 0–100 по мотивам риск-ориентированной системы Biocheck.UGent: кто угодно — владелец, практикант, студент — проходит её и получает итог, разрез по барьерам заноса и внутренним, топ-3 слабых блока «что чинить первым». Семь пакетов, включая те, которых у Biocheck нет: мелкое смешанное хозяйство, откорм КРС, овцы и козы, перепела. Для смешанного двора есть быстрый вход — скрининг из 12 красных флагов: две минуты, и видно, какие двери распахнуты.</p>
       </div>
     </div>
     <div class="ds-masthead__side">
@@ -325,6 +343,12 @@
       <p><b>Зеркало, а не проверка.</b> Считает ваш браузер — ответы не покидают телефон. Низкий балл не признание, а план улучшения.</p>
     </div>
     <div class="bb-packs" id="packs"></div>
+    <!-- v0.5: экспресс-вход для ЛПХ — скрининг красных флагов -->
+    <div class="bb-screen-strip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1Z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      <p class="bb-screen-txt"><b>Двадцати минут нет?</b> Быстрый скрининг двора — 12 вопросов о красных флагах, две минуты. Это не балл, а список распахнутых дверей: по нему видно, с чего начинать, — а полная анкета никуда не убежит.</p>
+      <button class="ds-btn ds-btn--sm" id="btn-screen" type="button">красные флаги — начать</button>
+    </div>
   </section>
 
   <!-- ======================= АНКЕТА ======================================== -->
@@ -375,7 +399,7 @@
       <h2>Как считается</h2>
       <p>Каждый вопрос имеет градуированные варианты ответа со своими баллами от 0 до 100. Категория (например «Новые животные» или «Мойка и дезинфекция») — среднее по отвеченным вопросам. Итог — взвешенное среднее категорий:</p>
       <div class="fx-formula">итог = Σ (вес категории × балл категории) / Σ весов отвеченных категорий</div>
-      <p>Пропущенные вопросы исключаются из расчёта честно: и из числителя, и из знаменателя — но итог честнее заполнять целиком, о пропусках результат предупреждает. Внешний блок («занос») и внутренний («внутри хозяйства») агрегируются отдельно по своим категориям. Веса категорий заданы профилем пакета: у птицы поднят вес грызунов и дикой птицы (грипп птиц), у свиней — перевозок (АЧС), у молочного КРС — доения; сумма весов каждого пакета равна 100 и гейтится автотестами.</p>
+      <p>Пропущенные вопросы исключаются из расчёта честно: и из числителя, и из знаменателя — но итог честнее заполнять целиком, о пропусках результат предупреждает. Внешний блок («занос») и внутренний («внутри хозяйства») агрегируются отдельно по своим категориям. Веса категорий заданы профилем пакета: у птицы поднят вес грызунов и дикой птицы (грипп птиц), у свиней — перевозок (АЧС), у молочного КРС — доения; сумма весов каждого пакета равна 100 и гейтится автотестами. У мелкого хозяйства (ЛПХ) с v0.5 — три класса по роли категории в жизни двора: «ворота» (новые животные, корм и вода, трупы, контакты между видами) — 10, «разнос» (визитёры, грызуны, тара, ограда, больные) — 7, «порядок» (транспорт, циклы, мойка, отсеки, лечение) — 5; 4×10 + 5×7 + 5×5 = 100. Переход с 14 ручных весов проверен на замороженных сценариях (scripts/bb_weight_stability.cjs): итоги дворов сдвигаются не больше чем на 1.6 балла, ядро топ-3 «что чинить» сохраняется, а дворы в полосе ±2.5 от порога 50/75 прямо видят пометку «между зонами» — хрупкость порога честнее предупредить, чем подгонять под него веса.</p>
 
       <h2>Бенчмарки — зарубежные, и это честно сказано</h2>
       <p>Сравнение — с опубликованными средними Biocheck.UGent по чужим странам; в России биобезопасность ферм систематически не обмерялась, своих бенчмарков нет. Для мелких смешанных дворов (ЛПХ), откорма КРС, мелких жвачных и перепелов бенчмарка не существует нигде в мире — Biocheck делает анкеты только для коммерческих производств. Поэтому там, где сравнивать не с чем, работает светофор уровней. Свои средние теперь собираются: с v0.4 любой может отправить анонимный итог одной кнопкой, и по мере набора выборки секция «Бенчмарк России» выше превращается из обещания в данные — впервые в мире, в том числе для ЛПХ.</p>
@@ -395,6 +419,7 @@
 
       <h2>Ограничения</h2>
       <ul>
+        <li><b>Скрининг — не балл.</b> «Красные флаги двора» ловят только распахнутые двери из 12 главных: между «флагов нет» и «крепко» — дистанция, которую показывает полная анкета. Флаг — честный «плохой» ответ (≤ 25 баллов варианта), средние ответы не флагаются.</li>
         <li><b>Это самооценка, а не аудит.</b> Анкету заполняет человек по своим наблюдениям; намеренное или случайное приукрашивание инструмент не ловит.</li>
         <li><b>Веса — редакционные.</b> Профили весов собраны по логике рисков и публикациям Biocheck, но не прошли российскую полевую валидацию. Читайте разрезы, а не десятую долю балла.</li>
         <li><b>Балл не заменяет ветеринара.</b> Он показывает, где барьеры тонкие; конкретные меры назначает специалист по вашему хозяйству.</li>
@@ -402,7 +427,7 @@
       </ul>
 
       <h2>План расширения</h2>
-      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. v0.4 — бенчмарк России: opt-in отправка анонимного итога одной кнопкой (тип хозяйства, итог и разрез категорий, по желанию округ и размер поголовья), витрина агрегатов «Бенчмарк России» и личная динамика прогонов. v0.4.1 — гигиена первого среза: маскировка малых групп на коллекторе (порог n ≥ 3), суточный лимит отправок, санитайзер агрегатов в витрине, JSONP-фолбэк удалён, снятие ответа повторным кликом, липкий прогресс анкеты и подтверждения сброса. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
+      <p>v0.1 — ядро и четыре пакета по 50–54 вопроса. v0.2 — шкала итога с зонами, цвета светофора в печати PDF, первый проход по тону. v0.3 — контент-волна: все пакеты по 69–76 вопросов, варианты «от нормы к проблеме» вместо списка самооговоров, три новых пакета — откорм КРС, овцы и козы, перепела. v0.4 — бенчмарк России: opt-in отправка анонимного итога одной кнопкой (тип хозяйства, итог и разрез категорий, по желанию округ и размер поголовья), витрина агрегатов «Бенчмарк России» и личная динамика прогонов. v0.4.1 — гигиена первого среза: маскировка малых групп на коллекторе (порог n ≥ 3), суточный лимит отправок, санитайзер агрегатов в витрине, JSONP-фолбэк удалён, снятие ответа повторным кликом, липкий прогресс анкеты и подтверждения сброса. v0.5 — adaptation под реалии двора: скрининг «красные флаги двора» (12 вопросов, счёт флагов вместо балла, уровни «двор держится / дыры есть / ворота открыты», ответы переносятся в полную анкету), три класса весов ЛПХ вместо 14 ручных с проверкой стабильности, из анкеты ЛПХ вырезаны вопросы-фантазии фермерской инфраструктуры (мойка транспорта на въезде, контроль дезинфекции посевами, «грязный выезд» в обход чистых зон) — 70 вопросов. Наука: подача в рецензируемый журнал открытого ПО (JOSS) — по правилам журнала не раньше полугода открытой истории репозитория, то есть с весны 2027.</p>
       </article>
     </details>
   </section>
@@ -411,7 +436,7 @@
 <footer class="ds-footer ds-footer--meta">
   <div class="wrap">
     <span class="legal">самооценка биобезопасности · не аудит и не ветеринарная консультация · бенчмарки — зарубежные публикации · <a href="./terms.html">условия и дисклеймер</a></span>
-    <span>v0.4.1 · подход — риск-ориентированная оценка по мотивам Biocheck.UGent · бенчмарк России — opt-in, анонимно · арифметика и payload гейтятся известными ответами (node --test)</span>
+    <span>v0.5 · подход — риск-ориентированная оценка по мотивам Biocheck.UGent · бенчмарк России — opt-in, анонимно · ЛПХ: скрининг-12 и три класса весов · арифметика и payload гейтятся известными ответами (node --test)</span>
     <span>источники: <a href="https://www.biocheckgent.com/en/about-us/how-our-checklists-are-built">Biocheck.UGent</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7597688">бройлеры, Филиппины</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4359795">свиньи, Швеция</a> · <a href="https://link.springer.com/article/10.1186/s40813-018-0113-6">свиньи, Ирландия</a> · <a href="https://www.sciencedirect.com/science/article/abs/pii/S1364815220300174">КРС</a> · ядро — <a href="https://github.com/shray77/vet-ds">vet-ds</a> · <a href="https://github.com/shray77/biobarrier-site">репозиторий</a></span>
   </div>
 </footer>
@@ -447,11 +472,12 @@
   });
 
   /* ---- состояние ------------------------------------------------------------ */
-  var state = { pack: null, mode: 0, answers: {} };
+  var state = { pack: null, flow: 'full', mode: 0, answers: {} };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
     if (saved && PACKS[saved.pack]) {
       state.pack = saved.pack; state.mode = saved.mode || 0;
+      state.flow = (saved.pack === 'mixed' && saved.flow === 'screen') ? 'screen' : 'full';
       state.answers = saved.answers || {};
     }
   } catch (e) {}
@@ -506,11 +532,16 @@
 
   function countAnswers() { return Object.keys(state.answers).length; }
 
-  function selectPack(id) {
-    if (id !== state.pack && countAnswers() > 10
+  function selectPack(id, flow) {
+    var samePack = id === state.pack;
+    if (!samePack && countAnswers() > 10
         && !window.confirm('Ответы текущей анкеты будут стёрты. Сменить хозяйство?')) { return; }
     state.pack = id;
-    state.answers = {};
+    /* v0.5: поток «скрининг» существует только у ЛПХ; смена потока внутри
+     * пакета ответы НЕ стирает — 12 вопросов скрининга входят в полную
+     * анкету, прогресс переезжает вместе с двором. */
+    state.flow = (id === 'mixed' && flow === 'screen') ? 'screen' : 'full';
+    if (!samePack) { state.answers = {}; }
     persist();
     renderPacks();
     renderQuiz();
@@ -526,6 +557,8 @@
   function renderQuiz() {
     var p = pack();
     if (!p) { $('quiz').hidden = true; return; }
+    $('btn-go').textContent = (state.flow === 'screen' && p.screen) ? 'показать флаги' : 'показать результат';
+    if (state.flow === 'screen' && p.screen) { renderScreenQuiz(p); return; }
     $('quiz-title').textContent = 'Анкета — ' + p.title;
     $('quiz-sub').textContent = p.sub + '. Ошиблись — нажмите на выбранный вариант ещё раз, он снимется; пропуск не портит балл.';
     var groups = [
@@ -562,6 +595,31 @@
     updateProgress();
   }
 
+  /* v0.5: анкета скрининга — плоский список 12 вопросов без весов и блоков:
+   * это не скор, а обход двора глазами. Структура вопроса та же — двойной
+   * язык, «почему важно», снятие ответа повторным кликом работают как в полной. */
+  function renderScreenQuiz(p) {
+    var scr = p.screen;
+    $('quiz-title').textContent = 'Скрининг — ' + scr.title;
+    $('quiz-sub').textContent = scr.sub + '. Это не балл, а счёт красных флагов: каждый честный «да, так и есть» — открытая дверь. Ошиблись — нажмите на выбранный вариант ещё раз, он снимется.';
+    var h = '<div class="bb-group">красные флаги — главные двери, через которые зараза заходит во двор</div>';
+    h += '<div class="bb-cat">';
+    scr.qs.forEach(function (qid) {
+      var q = BANK[qid];
+      h += '<div class="bb-q" data-q="' + esc(qid) + '">';
+      h += '<p class="bb-qt" data-t="q">' + esc(BB.text(q.q, state.mode)) + '</p>';
+      h += '<details class="bb-why"><summary>почему это важно</summary><p>' + esc(q.why) + '</p></details>';
+      h += '<div class="bb-opts" role="radiogroup" aria-label="' + esc(BB.text(q.q, state.mode)) + '">';
+      q.opts.forEach(function (o, i) {
+        h += '<label class="radio"><input type="radio" name="' + esc(qid) + '" value="' + i + '"' + (state.answers[qid] === i ? ' checked' : '') + '>' + esc(BB.text(o.t, state.mode)) + '</label>';
+      });
+      h += '</div></div>';
+    });
+    h += '</div>';
+    $('quiz-body').innerHTML = h;
+    updateProgress();
+  }
+
   function onAnswer(e) {
     var t = e.target;
     if (t && t.name && BANK[t.name] && t.type === 'radio') {
@@ -591,6 +649,13 @@
   function updateProgress() {
     var p = pack();
     if (!p) { return; }
+    if (state.flow === 'screen' && p.screen) {
+      var sq = p.screen.qs;
+      var sdone = sq.filter(function (qid) { return state.answers[qid] !== undefined; }).length;
+      $('prog-text').textContent = 'отвечено ' + sdone + ' из ' + sq.length;
+      $('prog-bar').style.width = (sq.length ? Math.round(100 * sdone / sq.length) : 0) + '%';
+      return;
+    }
     var n = BB.questionCount(p);
     var done = p.cats.reduce(function (a, c) {
       return a + c.qs.filter(function (qid) { return state.answers[qid] !== undefined; }).length;
@@ -630,12 +695,17 @@
   });
   $('btn-back').addEventListener('click', function () {
     if (countAnswers() > 10 && !window.confirm('Ответы будут стёрты. Вернуться к выбору хозяйства?')) { return; }
-    state.pack = null; state.answers = {};
+    state.pack = null; state.flow = 'full'; state.answers = {};
     persist();
     $('quiz').hidden = true; $('result').hidden = true;
     renderPacks();
     try { $('pick').scrollIntoView({ behavior: 'smooth' }); } catch (e) {}
   });
+  /* v0.5: кнопка-лента на экране выбора — вход в скрининг ЛПХ. */
+  $('btn-screen').addEventListener('click', function () {
+    selectPack('mixed', 'screen');
+  });
+
   $('btn-go').addEventListener('click', function () {
     computeAndRender();
     try { $('result').scrollIntoView({ behavior: 'smooth' }); } catch (e) {}
@@ -665,9 +735,82 @@
       + '<span class="bb-bench-note">данные других стран, не российские; сравнение — ориентир, а не норма</span></div>';
   }
 
+  /* ---- v0.5: результат скрининга — флаги, не балл ---------------------------- */
+  function renderScreenResult(p) {
+    var scr = p.screen;
+    var res = BB.computeScreen(scr, state.answers, BANK);
+    var out = $('res-body');
+    var h = '';
+
+    if (res.nAnswered === 0) {
+      out.innerHTML = '<div class="fx-empty">Пока не отвечено ни одного вопроса — вернитесь и отметьте хотя бы несколько. Флаг — это честный «да, так и есть», а не угаданный ответ.</div>';
+      $('result').hidden = false;
+      return;
+    }
+
+    var v = res.level;
+    h += '<div class="bb-print-note">БиоБарьер · скрининг «красные флаги двора» · ' + new Date().toLocaleDateString('ru-RU') + ' · расчёт — в браузере, без сервера</div>';
+    h += '<div class="fx-verdict"><span class="fx-big">' + res.nFlags + '<small style="font-size:18px;color:var(--faint)"> из ' + res.nTotal + ' — красные флаги</small></span>';
+    if (v) {
+      h += '<span class="' + (LEVEL_CLS[v.code] || '') + '">' + v.label + '</span><span class="fx-ci">' + v.why + '</span>';
+    } else {
+      h += '<span class="fx-ci">уровень появится, когда отвечено хотя бы 8 из 12 — на меньшем счёт ничего не гарантирует</span>';
+    }
+    h += '</div>';
+
+    if (res.missing > 0) {
+      h += '<div class="fx-warn"><b>отвечено ' + res.nAnswered + ' из ' + res.nTotal + '.</b> Счёт — по отвеченным: пропущенный вопрос не флаг и не «чистота», а неизвестность. Досмотрите список — флаги не любят недосказанности.</div>';
+    }
+
+    if (res.flags.length) {
+      h += '<div class="fx-flags"><h4>Ваши открытые двери — чините сверху вниз</h4><ol>';
+      res.flags.forEach(function (f) {
+        var q = BANK[f.qid];
+        var cat = CATS[f.cat] || { t: [f.cat, f.cat] };
+        h += '<li><b>' + esc(BB.text(q.q, state.mode)) + '</b>'
+          + '<span class="bb-whyline">' + esc(q.why) + '</span>'
+          + '<span class="bb-adv">' + esc(cat.advice) + '</span></li>';
+      });
+      h += '</ol></div>';
+    } else {
+      h += '<div class="fx-warn"><b>флагов нет.</b> Из отвеченных вопросов ни одна дверь не распахнута — но скрининг видит только 12 главных. Полная анкета покажет остальное.</div>';
+    }
+
+    h += '<p class="fx-thrline">скрининг — не балл и не аудит · 12 вопросов о главных воротах двора · уровни: 0–1 двор держится · 2–4 дыры · 5+ ворота открыты · никуда не отправляется</p>';
+    h += '<div class="fx-actions" id="res-actions">'
+      + '<button class="ds-btn ds-btn--primary" id="btn-full" type="button">пройти полную анкету — ' + plural(BB.questionCount(p), 'вопрос', 'вопроса', 'вопросов') + '</button>'
+      + '<button class="ds-btn" id="btn-copy" type="button">скопировать флаги</button>'
+      + '<button class="ds-btn" id="btn-print" type="button">печать / PDF</button>'
+      + '</div>';
+
+    out.innerHTML = h;
+    $('result').hidden = false;
+
+    /* Скрининг не участвует в бенчмарке России и истории прогонов:
+     * это не балл 0–100 — агрегировать его не с чем. Только локально. */
+
+    $('btn-full').addEventListener('click', function () {
+      state.flow = 'full';
+      persist();
+      renderQuiz();
+      $('result').hidden = true;
+      try { $('quiz').scrollIntoView({ behavior: 'smooth' }); } catch (e) {}
+      toast('ответы скрининга сохранены — они уже стоят в полной анкете');
+    });
+    $('btn-copy').addEventListener('click', function () {
+      var txt = BB.screenReportText(scr, res, BANK, state.mode);
+      var done = function () { toast('флаги скопированы — вставляйте в заметку или мессенджер'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+      } else { fallbackCopy(txt, done); }
+    });
+    $('btn-print').addEventListener('click', function () { window.print(); });
+  }
+
   function computeAndRender() {
     var p = pack();
     if (!p) { return; }
+    if (state.flow === 'screen' && p.screen) { renderScreenResult(p); return; }
     var res = BB.compute(p, state.answers, CATS, BANK);
     var out = $('res-body');
     var h = '';
@@ -692,6 +835,13 @@
        + '<b class="fx-mark" style="left:' + markL + '%"></b>'
        + '<div class="fx-ticks"><span style="left:0">0</span><span style="left:50%">50</span><span style="left:75%">75</span><span style="left:100%">100</span></div></div>'
        + '<p class="fx-scale-note">шкала итога 0–100: выше — лучше · критично &lt; 50 · есть дыры 50–74 · крепко ≥ 75</p>';
+
+    /* v0.5: честность у порога. Проверка стабильности весов показала: дворы
+     * в полосе ±2.5 от 50/75 перелетают зону при любой перекалибровке —
+     * такому итогу прямо говорим «между», вместо молчаливого цвета. */
+    if (Math.abs(res.total - 50) <= 2.5 || Math.abs(res.total - 75) <= 2.5) {
+      h += '<p class="fx-edge">итог стоит у границы зон: пара баллов может поменять цвет — читайте его как «между» и смотрите разрезы ниже</p>';
+    }
 
     h += '<div class="fx-stats">'
        + '<div class="fx-stat">внешний (занос)<b>' + fmt(res.ext) + '</b></div>'

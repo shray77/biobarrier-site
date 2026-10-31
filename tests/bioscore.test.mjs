@@ -129,6 +129,126 @@ test('пакеты: объём v0.3 — честные 60+ вопросов на
   }
 });
 
+/* ---------- 2b. v0.5: ЛПХ — три класса весов, порезка, скрининг ------------ */
+
+test('v0.5 ЛПХ: три класса весов {10, 7, 5} с проверенной раскладкой, Σ = 100', () => {
+  const p = PACKS.mixed;
+  const w = p.cats.map((c) => c.w);
+  assert.deepEqual([...new Set(w)].sort((a, b) => b - a), [10, 7, 5], 'веса ЛПХ — не три класса');
+  assert.equal(w.reduce((a, x) => a + x, 0), 100, 'Σ весов ЛПХ ≠ 100');
+  const CLASS = {
+    arrival: 10, feedwater: 10, deadstock: 10, contact: 10,          /* A «ворота» */
+    visitors: 7, vermin: 7, materials: 7, boundary: 7, sick: 7,      /* B «разнос» */
+    transport: 5, aiao: 5, cleandis: 5, compart: 5, treat: 5         /* C «порядок» */
+  };
+  for (const c of p.cats) {
+    assert.equal(c.w, CLASS[c.id], `${c.id}: вес ${c.w} не из класса ${CLASS[c.id]}`);
+  }
+  assert.equal(p.cats.filter((c) => c.w === 10).length, 4, 'класс A — не 4 категории');
+  assert.equal(p.cats.filter((c) => c.w === 7).length, 5, 'класс B — не 5 категорий');
+  assert.equal(p.cats.filter((c) => c.w === 5).length, 5, 'класс C — не 5 категорий');
+});
+
+test('v0.5 ЛПХ: фантазийные вопросы вырезаны из профиля, но живы в банке; объём 70', () => {
+  const qs = PACKS.mixed.cats.flatMap((c) => c.qs);
+  for (const cut of ['tr-02', 'cd-03', 'ds-04']) {
+    assert.ok(!qs.includes(cut), `${cut} должен быть вырезан из ЛПХ — фантазия фермерской инфраструктуры`);
+    assert.ok(BANK[cut], `${cut} должен остаться в общем банке — пакетам ферм нужен`);
+  }
+  assert.equal(BioBarrier.questionCount(PACKS.mixed), 70, 'объём ЛПХ ≠ 70 вопросов');
+});
+
+test('v0.5 скрининг: определение — 12 вопросов пакета ЛПХ, у каждого есть флаг-вариант и не-флаг', () => {
+  const scr = PACKS.mixed.screen;
+  assert.ok(scr, 'у пакета ЛПХ нет скрининга');
+  assert.equal(scr.qs.length, 12, 'скрининг — не 12 вопросов');
+  assert.equal(scr.flagBelow, 25, 'порог флага ≠ 25');
+  const packQs = PACKS.mixed.cats.flatMap((c) => c.qs);
+  const seen = new Set();
+  for (const qid of scr.qs) {
+    assert.ok(BANK[qid], `скрининг: ${qid} не найден в банке`);
+    assert.ok(packQs.includes(qid), `скрининг: ${qid} не входит в пакет ЛПХ`);
+    assert.ok(!seen.has(qid), `скрининг: ${qid} дублируется`);
+    seen.add(qid);
+    assert.ok(BANK[qid].opts.some((o) => o.s <= scr.flagBelow), `скрининг: у ${qid} нет варианта-флага`);
+    assert.ok(BANK[qid].opts.some((o) => o.s > scr.flagBelow), `скрининг: у ${qid} даже лучший вариант — флаг`);
+  }
+});
+
+test('v0.5 скрининг: худшие ответы → 12 флагов, «ворота открыты»', () => {
+  const scr = PACKS.mixed.screen;
+  const worst = {};
+  scr.qs.forEach((qid) => { worst[qid] = BANK[qid].opts.length - 1; });
+  const r = BioBarrier.computeScreen(scr, worst, BANK);
+  assert.equal(r.nFlags, 12);
+  assert.equal(r.nAnswered, 12);
+  assert.equal(r.missing, 0);
+  assert.equal(r.level.code, 'bad');
+  assert.equal(r.level.label, 'ворота открыты');
+});
+
+test('v0.5 скрининг: лучшие ответы → 0 флагов, «двор держится»', () => {
+  const scr = PACKS.mixed.screen;
+  const best = {};
+  scr.qs.forEach((qid) => { best[qid] = 0; });
+  const r = BioBarrier.computeScreen(scr, best, BANK);
+  assert.equal(r.nFlags, 0);
+  assert.equal(r.nAnswered, 12);
+  assert.equal(r.level.code, 'good');
+});
+
+test('v0.5 скрининг: средние ответы не флагаются; известный смешанный счёт', () => {
+  const scr = PACKS.mixed.screen;
+  const mid = {};
+  scr.qs.forEach((qid) => { mid[qid] = Math.floor((BANK[qid].opts.length - 1) / 2); });
+  const rm = BioBarrier.computeScreen(scr, mid, BANK);
+  assert.equal(rm.nFlags, 0, 'средние ответы не должны поднимать флаги');
+  assert.equal(rm.level.code, 'good');
+  const mixed = {};
+  scr.qs.forEach((qid, i) => { mixed[qid] = i < 3 ? BANK[qid].opts.length - 1 : 0; });
+  const r = BioBarrier.computeScreen(scr, mixed, BANK);
+  assert.equal(r.nFlags, 3);
+  assert.equal(r.level.code, 'mid');
+  assert.equal(r.level.label, 'дыры есть');
+});
+
+test('v0.5 скрининг: пропущенный вопрос — не флаг и не «чистота»; уровень с 8 ответов', () => {
+  const scr = PACKS.mixed.screen;
+  const seven = {};
+  scr.qs.slice(0, 7).forEach((qid) => { seven[qid] = 0; });
+  const r = BioBarrier.computeScreen(scr, seven, BANK);
+  assert.equal(r.nFlags, 0);
+  assert.equal(r.nAnswered, 7);
+  assert.equal(r.missing, 5);
+  assert.equal(r.level, null, 'семи ответов мало для уровня');
+  const eight = {};
+  scr.qs.slice(0, 8).forEach((qid) => { eight[qid] = 0; });
+  assert.equal(BioBarrier.computeScreen(scr, eight, BANK).level.code, 'good');
+  assert.equal(BioBarrier.computeScreen(scr, {}, BANK).level, null, 'ноль ответов — не «двор держится»');
+});
+
+test('v0.5 скрининг: пороги уровней 0–1 / 2–4 / 5+ не дрейфуют', () => {
+  assert.equal(BioBarrier.screenLevel(0).code, 'good');
+  assert.equal(BioBarrier.screenLevel(1).code, 'good');
+  assert.equal(BioBarrier.screenLevel(2).code, 'mid');
+  assert.equal(BioBarrier.screenLevel(4).code, 'mid');
+  assert.equal(BioBarrier.screenLevel(5).code, 'bad');
+  assert.equal(BioBarrier.screenLevel(12).code, 'bad');
+});
+
+test('v0.5 отчёт скрининга: без undefined и NaN, со счётом и подписью витрины', () => {
+  const scr = PACKS.mixed.screen;
+  const worst = {};
+  scr.qs.forEach((qid) => { worst[qid] = BANK[qid].opts.length - 1; });
+  const r = BioBarrier.computeScreen(scr, worst, BANK);
+  for (const mode of [0, 1]) {
+    const txt = BioBarrier.screenReportText(scr, r, BANK, mode);
+    assert.ok(!txt.includes('undefined') && !txt.includes('NaN'), 'мусор в отчёте скрининга');
+    assert.ok(txt.includes('БиоБарьер') && txt.includes('biobarrier-site'), 'нет подписи витрины');
+    assert.ok(txt.includes('Флагов: 12 из 12'), 'нет счёта флагов');
+  }
+});
+
 /* ---------- 3. бенчмарки --------------------------------------------------- */
 
 test('бенчмарки: числа в 0..100 и источник; свиньи без итога (честно)', () => {
@@ -328,4 +448,19 @@ test('витрина: светофор печатается в PDF — print-col
   assert.ok(html.includes('-webkit-print-color-adjust: exact'), 'нет -webkit-префикса для Safari');
   assert.ok(/beforeprint/.test(html), 'печать не переводит тёмную тему в белую');
   assert.ok(html.includes('bb-privacy'), 'нет баннера «зеркало, а не проверка»');
+});
+
+test('витрина v0.5: лента скрининга, «между зонами» у порога, скрининг не трогает телеметрию', () => {
+  const html = readFileSync(join(HERE, '..', 'index.html'), 'utf8');
+  assert.ok(html.includes('bb-screen-strip'), 'нет ленты скрининга на экране выбора');
+  assert.ok(html.includes('красные флаги'), 'экран выбора не называет красные флаги');
+  assert.ok(html.includes('fx-edge'), 'нет пометки «между зонами» у порога');
+  assert.ok(/Math\.abs\(res\.total - 50\) <= 2\.5/.test(html), 'нет полосы честности ±2.5 у порога 50');
+  assert.ok(html.includes('показать флаги'), 'нет кнопки результата скрининга');
+  assert.ok(html.includes('онлайн · v0.5'), 'версия в шапке не поднята до v0.5');
+  /* скрининг — только локально: блок рендера флагов не зовёт телеметрию */
+  const seg = html.slice(html.indexOf('function renderScreenResult'), html.indexOf('function computeAndRender'));
+  assert.ok(seg.length > 500, 'не найден блок renderScreenResult');
+  assert.ok(!seg.includes('pushRun') && !seg.includes('renderShareCard') && !seg.includes('BBTelemetry'),
+    'скрининг не должен уходить в бенчмарк России и историю прогонов');
 });

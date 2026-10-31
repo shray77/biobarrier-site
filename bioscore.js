@@ -17,6 +17,11 @@
  *  - бенчмарки — только зарубежные публикации Biocheck.UGent, честно
  *    помечены; для пакета «мелкое хозяйство» бенчмарка в мире нет.
  *
+ * v0.5 — скрининг «красные флаги двора» (ЛПХ): 12 вопросов, флаг =
+ * выбранный вариант с баллом ≤ flagBelow. Это НЕ балл 0–100 и не
+ * телеметрия: счёт флагов живёт только в браузере. Уровень появляется
+ * при minAnswered+ ответах — на меньшем счёт ничего не гарантирует.
+ *
  * UMD: браузер — globalThis.BioBarrier, тесты — export default.
  */
 (function (root, factory) {
@@ -149,6 +154,54 @@
     return LEVELS[LEVELS.length - 1];
   }
 
+  /* v0.5: уровни скрининга «красные флаги двора». Пороги — редакционная
+   * шкала витрины (как у светофора итога): 0–1 держится, 2–4 дыры,
+   * 5+ ворота открыты. Считаются ТОЛЬКО от отвеченных вопросов:
+   * пропущенный вопрос не флаг и не «чистота» — он неизвестность. */
+  var SCREEN_LEVELS = [
+    { max: 1, code: "good", label: "двор держится", why: "флагов почти нет — ворота в основном закрыты; полную анкету пройдите, когда будет минут двадцать" },
+    { max: 4, code: "mid", label: "дыры есть", why: "несколько дверей распахнуты — флаги ниже и есть первые шаги" },
+    { max: Infinity, code: "bad", label: "ворота открыты", why: "половина барьеров не работает — начните с флагов ниже, полная анкета соберёт план целиком" }
+  ];
+
+  function screenLevel(nFlags) {
+    for (var i = 0; i < SCREEN_LEVELS.length; i += 1) {
+      if (nFlags <= SCREEN_LEVELS[i].max) { return SCREEN_LEVELS[i]; }
+    }
+    return SCREEN_LEVELS[SCREEN_LEVELS.length - 1];
+  }
+
+  /* Скор скрининга: счёт красных флагов по отвеченным. Возвращает структуру
+   * для рендера и золотых тестов. Уровень появляется только когда отвечено
+   * minAnswered+ вопросов (по умолчанию 2/3 списка): один-два ответа не
+   * дают права говорить «двор держится». */
+  function computeScreen(scr, answers, bank) {
+    var flagBelow = scr.flagBelow === undefined ? 25 : scr.flagBelow;
+    var minAnswered = scr.minAnswered === undefined ? 8 : scr.minAnswered;
+    var flags = [], nAnswered = 0;
+    scr.qs.forEach(function (qid) {
+      var q = bank[qid];
+      if (!q) { throw new Error("вопрос не найден в банке: " + qid); }
+      var idx = answers[qid];
+      if (idx === undefined || idx === null) { return; }
+      var opt = q.opts[idx];
+      if (!opt) { return; }
+      nAnswered += 1;
+      if (opt.s <= flagBelow) {
+        flags.push({ qid: qid, cat: q.cat, score: opt.s });
+      }
+    });
+    return {
+      id: scr.id,
+      flags: flags,
+      nFlags: flags.length,
+      nTotal: scr.qs.length,
+      nAnswered: nAnswered,
+      missing: scr.qs.length - nAnswered,
+      level: nAnswered >= minAnswered ? screenLevel(flags.length) : null
+    };
+  }
+
   /* Копируемый отчёт: короткий текст без HTML, для заметки/мессенджера. */
   function reportText(pack, res, cats, mode) {
     var m = Math.abs(mode || 0) % 2;
@@ -172,10 +225,29 @@
     return lines.join("\n");
   }
 
+  /* Копируемый отчёт скрининга: короткий текст без HTML. */
+  function screenReportText(scr, res, bank, mode) {
+    var m = Math.abs(mode || 0) % 2;
+    var lines = [];
+    lines.push("БиоБарьер — красные флаги двора (скрининг ЛПХ)");
+    lines.push("Флагов: " + res.nFlags + " из " + res.nTotal + (res.level ? " · " + res.level.label : ""));
+    if (res.missing > 0) { lines.push("Отвечено: " + res.nAnswered + " из " + res.nTotal + " — счёт по отвеченным"); }
+    if (res.flags.length) {
+      lines.push("Флаги:");
+      res.flags.forEach(function (f, i) {
+        lines.push("  " + (i + 1) + ". " + text(bank[f.qid].q, m));
+      });
+    }
+    lines.push("Скрининг, не балл · полная анкета — https://shray77.github.io/biobarrier-site/");
+    return lines.join("\n");
+  }
+
   return {
     MODE_OWNER: MODE_OWNER, MODE_PRO: MODE_PRO,
     text: text, level: level, LEVELS: LEVELS,
+    screenLevel: screenLevel, SCREEN_LEVELS: SCREEN_LEVELS,
     questionCount: questionCount, categoryCount: categoryCount,
-    categoryScore: categoryScore, compute: compute, reportText: reportText
+    categoryScore: categoryScore, compute: compute, reportText: reportText,
+    computeScreen: computeScreen, screenReportText: screenReportText
   };
 });
