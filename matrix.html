@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>БиоБарьер — матрица «вопрос ↔ норма»: правовая основа анкеты</title>
+<meta name="description" content="Матрица «вопрос ↔ норма» БиоБарьера: 157 вопросов анкеты — и действующие ветеринарные акты РФ за каждым. Прямые пункты, общие обязанности владельца по ст. 18 Закона «О ветеринарии» или честное «прямой нормы нет — профилактическая практика». Реквизиты сверены по официальным публикациям; страница для ветеринарных специалистов.">
+<meta property="og:title" content="БиоБарьер — матрица «вопрос ↔ норма»">
+<meta property="og:description" content="Правовая основа всех 157 вопросов анкеты: действующие приказы Минсельхоза и Закон «О ветеринарии», со статусами «норма / рама / практика». Для специалистов.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://shray77.github.io/biobarrier-site/matrix.html">
+<meta property="og:image" content="https://shray77.github.io/biobarrier-site/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://shray77.github.io/biobarrier-site/matrix.html">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232F6B47' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z'/><path d='m9 12 2 2 4-4'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./vet-ds.css">
+<script>(function(){try{if(localStorage.getItem("vetds-theme")==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}})()</script>
+<style>
+  :root {
+    --ds-accent: #2F6B47; --ds-accent-strong: #26543A; --ds-accent-ink: #ECF5EF;
+    --bg: var(--ds-bg); --surface: var(--ds-surface); --surface2: var(--ds-surface2); --border: var(--ds-border);
+    --text: var(--ds-text); --muted: var(--ds-muted); --faint: var(--ds-faint);
+    --accent: var(--ds-accent);
+    --red: var(--ds-red); --orange: var(--ds-orange); --amber: var(--ds-amber);
+    --green: var(--ds-green); --blue: var(--ds-blue); --violet: var(--ds-violet);
+    --mono: var(--ds-font-mono);
+  }
+  [data-theme="dark"] { --ds-accent: #8CBE9F; --ds-accent-strong: #A9D4B8; --ds-accent-ink: #142419; }
+  * { box-sizing: border-box; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  body { background: var(--bg); color: var(--text); font: 16px/1.6 var(--ds-font-sans); margin: 0; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  .ds-hub { max-width: 1080px; margin: 0 auto; padding: 12px 20px 0; }
+
+  .mx-lead { border: 1px dashed var(--ds-border-strong); border-radius: var(--ds-radius); padding: 14px 16px; margin: 18px 0; font-size: 14px; }
+  .mx-lead b { font-family: var(--mono); font-size: 12.5px; letter-spacing: .02em; }
+  .mx-meta { font: 500 12px/1.5 var(--mono); color: var(--muted); margin-top: 6px; }
+
+  h2 { font: 400 26px/1.2 var(--ds-font-display); letter-spacing: -.01em; margin: 34px 0 10px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; max-width: 72ch; }
+
+  /* реестр актов */
+  .tbl-scroll { overflow-x: auto; margin: 10px 0 4px; }
+  table.acts, table.mx-tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.acts caption, table.mx-tbl caption { caption-side: bottom; text-align: left; color: var(--faint); font: 500 11.5px var(--mono); padding: 8px 2px 2px; }
+  table.acts th, table.mx-tbl th { text-align: left; font: 600 11.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--ds-border-strong); padding: 8px 10px 6px; }
+  table.acts td, table.mx-tbl td { border-bottom: 1px solid var(--border); padding: 9px 10px; vertical-align: top; }
+  table.acts td.a-req { white-space: nowrap; }
+  .a-num { font: 700 13px var(--mono); }
+  .a-date { color: var(--faint); font: 500 11.5px var(--mono); white-space: nowrap; }
+  .a-warn { color: var(--orange); }
+  .a-src { font-size: 12px; }
+
+  /* фильтры */
+  .mx-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 14px 0 10px; position: sticky; top: 0; background: var(--bg); padding: 10px 0 8px; border-bottom: 1px solid var(--border); z-index: 5; }
+  .mx-filters label { display: flex; flex-direction: column; gap: 3px; font: 600 11px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .mx-filters select, .mx-filters input { font: 500 13px var(--ds-font-sans); color: var(--text); background: var(--surface); border: 1px solid var(--ds-border-strong); border-radius: var(--ds-radius); padding: 6px 8px; min-width: 120px; }
+  .mx-count { font: 500 12px var(--mono); color: var(--muted); margin-left: auto; align-self: center; }
+
+  /* матрица */
+  .mx-cat { margin: 26px 0 6px; font: 600 15px/1.3 var(--ds-font-sans); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .mx-cat .c-g { font: 500 11px var(--mono); color: var(--faint); letter-spacing: .04em; }
+  .mx-qid { font: 700 12px var(--mono); color: var(--faint); white-space: nowrap; }
+  .mx-q { font-weight: 600; }
+  .mx-pkgs { font: 500 10.5px var(--mono); color: var(--faint); white-space: nowrap; }
+  .st { font: 700 11px var(--mono); letter-spacing: .03em; white-space: nowrap; }
+  .st-norm { color: var(--green); }
+  .st-frame { color: var(--amber); }
+  .st-practice { color: var(--violet); }
+  .mx-ref { margin: 3px 0 0; padding: 0; list-style: none; }
+  .mx-ref li { font-size: 13px; margin: 2px 0; }
+  .mx-ref .r-a { font: 700 12px var(--mono); color: var(--accent); }
+  .mx-ref .r-p { font: 600 11.5px var(--mono); color: var(--muted); }
+  .mx-note { font-size: 12.5px; color: var(--muted); margin: 3px 0 0; }
+  .mx-none { color: var(--violet); font-size: 13px; }
+
+  .mx-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
+  .mx-legend b { font: 700 11px var(--mono); letter-spacing: .03em; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 40px; padding: 18px 0 14px; }
+  footer .legal { color: var(--green); font-size: 12px; }
+  footer span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+  @media (max-width: 640px) {
+    .mx-filters { position: static; }
+    table.mx-tbl td, table.acts td { padding: 7px 6px; }
+    .a-req { white-space: normal; }
+    .mx-pkgs { white-space: normal; }
+  }
+  @media print {
+    .mx-filters, .ds-hub, .ds-theme-toggle { display: none !important; }
+    body { font-size: 11px; }
+    .tbl-scroll { overflow: visible; }
+    table.acts, table.mx-tbl { font-size: 10px; }
+    .mx-cat { break-after: avoid; }
+    tr { break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<nav class="ds-hub">
+  <a href="https://shray77.github.io/vetdigest-site/">Дайджест науки</a>
+  <a href="https://shray77.github.io/vetrecall-site/">Отзывы и вспышки РФ</a>
+  <a href="https://shray77.github.io/biothreat-site/">Биоугрозы мира</a>
+  <a href="https://shray77.github.io/vet-heatmap/">ВетКарта</a>
+  <a href="https://shray77.github.io/vetflu-site/">Окна риска ВПГП</a>
+  <a href="https://shray77.github.io/vet-meteo/">ВетМетео</a>
+  <a href="https://shray77.github.io/rss-core-site/">Статус ядра</a>
+  <a href="https://shray77.github.io/vetfecrt-site/">ФЭКРТ</a>
+  <a href="https://shray77.github.io/biobarrier-site/" class="on" aria-current="page">БиоБарьер</a>
+  <a href="https://shray77.github.io/vettools/">ВетТулс</a>
+  <a href="https://shray77.github.io/vet-hub/">ВетХаб</a>
+</nav>
+<script>(function(){var a=document.querySelector('.ds-hub a.on');if(a)a.scrollIntoView({block:'nearest',inline:'center'});})();</script>
+
+<header class="ds-masthead">
+  <div class="wrap">
+    <div class="ds-masthead-meta"><span>biobarrier · матрица «вопрос ↔ норма»</span><span class="m-date">сверено 31.10.2026</span></div>
+  </div>
+  <div class="wrap ds-masthead__row">
+    <div class="ds-masthead__brand">
+      <div class="ds-masthead__logo"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <div>
+        <h1 class="ds-masthead__title">Матрица «вопрос ↔ норма»</h1>
+        <p class="ds-masthead__sub">Правовая основа всех 157 вопросов анкеты БиоБарьер: за каждым — либо прямой пункт действующего акта, либо общая обязанность владельца по ст. 18 Закона «О ветеринарии», либо честное «прямой нормы нет — профилактическая практика». Страница для ветеринарных специалистов; анкета работает и без неё. <a href="./index.html">← к анкете</a></p>
+      </div>
+    </div>
+    <div class="ds-masthead__side">
+      <button class="ds-btn ds-btn--sm ds-theme-toggle ds-theme-toggle--labeled theme-pill" id="themeToggle" aria-label="Переключить тему" title="Переключить тему">
+        <svg class="ds-theme-toggle__sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg>
+        <svg class="ds-theme-toggle__moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <span class="ds-theme-toggle__label" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+<div class="ds-rule-double"></div>
+
+<main class="wrap">
+
+  <div class="mx-lead">
+    <b>ЗАЧЕМ ЭТА СТРАНИЦА.</b> Анкета — «зеркало практик», а не перечень требований, но каждый вопрос обязан иметь проверяемое основание. Здесь видно, где основание — прямая норма, где — рама закона, а где — риск-ориентированная практика без нормы. Это ответ на требование научного спора v0.4.1: «матрица имеет смысл только с реальными реквизитами актов, иначе она — фабрика мифов».
+    <div class="mx-meta" id="meta-line"></div>
+  </div>
+
+  <div class="mx-legend">
+    <span><b class="st st-norm">норма</b> — прямой пункт действующего акта (в примечании — для кого: ЛПХ или фермы)</span>
+    <span><b class="st st-frame">рама</b> — общие обязанности владельца, ст. 18 Закона № 4979-1</span>
+    <span><b class="st st-practice">практика</b> — нормы нет: рекомендуемая профилактическая мера</span>
+  </div>
+
+  <h2>Действующие акты в основе анкеты</h2>
+  <p class="sub">Реквизиты и статус сверены по официальным публикациям текстов. Номер пункта проставлен только там, где сверен по тексту акта; у части актов дана ссылка на документ целиком.</p>
+  <div class="tbl-scroll"><table class="acts" id="acts-tbl">
+    <caption>реестр актов матрицы · сверка 31.10.2026 · акты обновляются — до применения сверяйтесь с первоисточником</caption>
+    <thead><tr><th>акт</th><th>срок действия</th><th>для кого</th><th>ключевое для анкеты</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="sub" id="superseded-line"></p>
+
+  <h2>Вопросы и их нормы</h2>
+  <p class="sub">Формулировки — в профессиональном языке анкеты. Фильтры работают вместе; «пакет» показывает, в какие анкеты вопрос входит.</p>
+
+  <div class="mx-filters" id="filters">
+    <label>пакет<select id="f-pkg"><option value="">все</option></select></label>
+    <label>категория<select id="f-cat"><option value="">все</option></select></label>
+    <label>статус<select id="f-st">
+      <option value="">все</option>
+      <option value="norm">норма</option>
+      <option value="frame">рама</option>
+      <option value="practice">практика</option>
+    </select></label>
+    <label>поиск<input id="f-q" type="search" placeholder="текст или id" style="min-width:180px"></label>
+    <span class="mx-count" id="f-count"></span>
+  </div>
+
+  <div id="matrix"></div>
+
+  <h2>Как читать и чего здесь нет</h2>
+  <p class="sub">Статус «практика» — не слабость вопроса, а честная граница права: зональный инвентарь, маршрут «от чистого к грязному», ротация антигельминтиков закон не предписывает — это работающие меры риск-ориентированного подхода (Biocheck.UGent). Статус «рама» означает: деталь не расписана, но подпадает под общие обязанности владельца (зоогигиена, ветеринарно-санитарные требования). Матрица не ставит юридических оценок двору и не заменяет ни ветеринарную консультацию, ни первоисточник: перед применением сверяйте актуальную редакцию акта по официальной публикации. Об устаревании актов выше страница честно предупреждает.</p>
+</main>
+
+<footer class="ds-footer ds-footer--meta">
+  <div class="wrap">
+    <span class="legal">правовая основа анкеты · не юридическая консультация · реквизиты сверены 31.10.2026, акты обновляются · <a href="./terms.html">условия и дисклеймер</a></span>
+    <span>v0.6 · матрица «вопрос ↔ норма» · 157 вопросов × 9 действующих актов · сверка и покрытие гейтятся автотестами (node --test) · <a href="./index.html">анкета</a> · <a href="https://github.com/shray77/biobarrier-site">репозиторий</a></span>
+  </div>
+</footer>
+
+<script src="./data-shared.js"></script>
+<script src="./data-poultry.js"></script>
+<script src="./data-pigs.js"></script>
+<script src="./data-dairy.js"></script>
+<script src="./data-mixed.js"></script>
+<script src="./data-beef.js"></script>
+<script src="./data-smallrum.js"></script>
+<script src="./data-quail.js"></script>
+<script src="./data-npa.js"></script>
+<script>
+(function () {
+  'use strict';
+  var CATS = globalThis.BBCATS, BANK = globalThis.BBQ, PACKS = globalThis.BBPACKS;
+  var NPA = globalThis.BBNPA, MAP = globalThis.BBNPA_MAP, SUP = globalThis.BBNPA_SUPERSEDED, META = globalThis.BB_NPA_META;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  }); }
+
+  $('themeToggle').addEventListener('click', function () {
+    var el = document.documentElement;
+    var dark = el.getAttribute('data-theme') === 'dark';
+    el.setAttribute('data-theme', dark ? 'light' : 'dark');
+    try { localStorage.setItem('vetds-theme', dark ? 'light' : 'dark'); } catch (e) {}
+  });
+
+  $('meta-line').textContent = 'сверка ' + META.checked + ' · ' + META.how + ' · ' + META.note;
+
+  /* ---- реестр актов ------------------------------------------------------- */
+  var PK_LABEL = {
+    poultry: 'птица', pigs: 'свиньи', dairy: 'молочный КРС', beef: 'откорм КРС',
+    smallrum: 'овцы и козы', quail: 'перепела', mixed: 'ЛПХ (смешанный двор)'
+  };
+  var ab = '';
+  for (var id in NPA) {
+    var a = NPA[id];
+    var life = a.inForce || '';
+    var warn = /по 31\.12\.2026|на исходе/.test(life) ? ' <span class="a-warn">⚠ срок на исходе — следить за заменой</span>' : '';
+    var rep = a.replaced ? '<div class="a-date">отменил: ' + esc(a.replaced) + '</div>' : '';
+    ab += '<tr><td class="a-req"><span class="a-num">' + esc(a.kind + ' ' + a.num) + '</span>'
+      + '<div class="a-date">от ' + esc(a.date) + '</div>' + rep
+      + '<div class="a-src"><a href="' + esc(a.src) + '" target="_blank" rel="noopener">текст акта ↗</a></div></td>'
+      + '<td>' + esc(life) + warn + '</td>'
+      + '<td>' + esc(a.scope) + '</td>'
+      + '<td>' + esc(a.key) + '</td></tr>';
+  }
+  $('acts-tbl').querySelector('tbody').innerHTML = ab;
+  $('superseded-line').innerHTML = '<b>Отменённые акты, на которые нельзя ссылаться:</b> '
+    + SUP.map(function (s) { return esc(s.num + ' от ' + s.date + ' (' + s.what + ') — заменён ' + s.by); }).join('; ')
+    + '. Проверка «матрица не ссылается на отменённое» — автотестом.';
+
+  /* ---- принадлежность вопросов пакетам ----------------------------------- */
+  var qOwners = {};
+  for (var pid in PACKS) {
+    PACKS[pid].cats.forEach(function (c) {
+      c.qs.forEach(function (qid) { (qOwners[qid] = qOwners[qid] || []).push(pid); });
+    });
+  }
+
+  /* ---- фильтры ------------------------------------------------------------ */
+  var pkgSel = $('f-pkg'), catSel = $('f-cat'), stSel = $('f-st'), qInp = $('f-q');
+  Object.keys(PACKS).forEach(function (pid) {
+    var o = document.createElement('option');
+    o.value = pid; o.textContent = PK_LABEL[pid] || PACKS[pid].title;
+    pkgSel.appendChild(o);
+  });
+  Object.keys(CATS).forEach(function (cid) {
+    var o = document.createElement('option');
+    o.value = cid; o.textContent = CATS[cid].t[1];
+    catSel.appendChild(o);
+  });
+
+  var ST_LABEL = { norm: 'норма', frame: 'рама', practice: 'практика' };
+
+  function actTitle(id) {
+    var a = NPA[id];
+    return a.kind.replace('Приказ Минсельхоза России', 'Приказ') + ' ' + a.num;
+  }
+
+  function rowFor(qid, m) {
+    var q = BANK[qid];
+    var refs = '';
+    if (m.st === 'practice' && (!m.refs || !m.refs.length)) {
+      refs = '<div class="mx-none">прямой нормы нет — профилактическая практика</div>';
+    }
+    (m.refs || []).forEach(function (r) {
+      refs += '<li><span class="r-a">' + esc(actTitle(r[0])) + '</span>'
+        + (r[1] ? ' <span class="r-p">' + esc(r[1]) + '</span>' : '')
+        + ' — ' + esc(r[2]) + '</li>';
+    });
+    if (refs) { refs = '<ul class="mx-ref">' + refs + '</ul>'; }
+    if (m.note) { refs += '<div class="mx-note">' + esc(m.note) + '</div>'; }
+    var owners = (qOwners[qid] || []).map(function (p) { return PK_LABEL[p] || p; }).join(', ');
+    return '<tr data-q="' + esc(qid) + '" data-cat="' + esc(q.cat) + '" data-st="' + esc(m.st) + '">'
+      + '<td><span class="mx-qid">' + esc(qid) + '</span><div class="mx-q">' + esc(q.q[1]) + '</div>'
+      + '<div class="mx-pkgs">' + esc(owners) + '</div></td>'
+      + '<td><span class="st st-' + esc(m.st) + '">' + ST_LABEL[m.st] + '</span></td>'
+      + '<td>' + refs + '</td></tr>';
+  }
+
+  function render() {
+    var h = '';
+    var catOrder = Object.keys(CATS);
+    var shown = 0;
+    var pkg = pkgSel.value, cat = catSel.value, st = stSel.value;
+    var needle = qInp.value.trim().toLowerCase();
+    catOrder.forEach(function (cid) {
+      if (cat && cid !== cat) { return; }
+      var qs = Object.keys(BANK).filter(function (qid) { return BANK[qid].cat === cid; });
+      var rows = '';
+      qs.forEach(function (qid) {
+        var m = MAP[qid];
+        if (!m) { return; }
+        if (st && m.st !== st) { return; }
+        if (pkg && (qOwners[qid] || []).indexOf(pkg) === -1) { return; }
+        if (needle && (qid + ' ' + BANK[qid].q[1] + ' ' + BANK[qid].q[0]).toLowerCase().indexOf(needle) === -1) { return; }
+        rows += rowFor(qid, m);
+        shown += 1;
+      });
+      if (rows) {
+        h += '<div class="mx-cat">' + esc(CATS[cid].t[1])
+          + '<span class="c-g">' + (CATS[cid].g === 'ext' ? 'барьер заноса' : 'барьер внутри') + ' · ' + esc(cid) + '</span></div>'
+          + '<div class="tbl-scroll"><table class="mx-tbl"><thead><tr><th style="width:42%">вопрос (профессиональный язык)</th><th>статус</th><th>нормы</th></tr></thead><tbody>'
+          + rows + '</tbody></table></div>';
+      }
+    });
+    $('matrix').innerHTML = h || '<p class="sub">Ничего не найдено — ослабьте фильтры.</p>';
+    $('f-count').textContent = shown + ' из ' + Object.keys(MAP).length + ' вопросов';
+  }
+
+  [pkgSel, catSel, stSel].forEach(function (el) {
+    el.addEventListener('change', render);
+  });
+  qInp.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

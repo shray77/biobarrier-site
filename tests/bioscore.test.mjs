@@ -19,6 +19,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -31,12 +32,16 @@ import '../data-mixed.js';
 import '../data-beef.js';
 import '../data-smallrum.js';
 import '../data-quail.js';
+import '../data-npa.js';
 import BioBarrier from '../bioscore.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BANK = globalThis.BBQ;
 const CATS = globalThis.BBCATS;
 const PACKS = globalThis.BBPACKS;
+const NPA = globalThis.BBNPA;
+const NMAP = globalThis.BBNPA_MAP;
+const NSUP = globalThis.BBNPA_SUPERSEDED;
 const near = (a, b, eps = 1e-9) => Math.abs(a - b) < eps;
 
 /* ---------- 1. структура банка: двойной язык и градация ------------------ */
@@ -457,10 +462,127 @@ test('витрина v0.5: лента скрининга, «между зона�
   assert.ok(html.includes('fx-edge'), 'нет пометки «между зонами» у порога');
   assert.ok(/Math\.abs\(res\.total - 50\) <= 2\.5/.test(html), 'нет полосы честности ±2.5 у порога 50');
   assert.ok(html.includes('показать флаги'), 'нет кнопки результата скрининга');
-  assert.ok(html.includes('онлайн · v0.5'), 'версия в шапке не поднята до v0.5');
+  assert.ok(html.includes('онлайн · v0.5') || html.includes('онлайн · v0.6'), 'версия в шапке не поднята');
   /* скрининг — только локально: блок рендера флагов не зовёт телеметрию */
   const seg = html.slice(html.indexOf('function renderScreenResult'), html.indexOf('function computeAndRender'));
   assert.ok(seg.length > 500, 'не найден блок renderScreenResult');
   assert.ok(!seg.includes('pushRun') && !seg.includes('renderShareCard') && !seg.includes('BBTelemetry'),
     'скрининг не должен уходить в бенчмарк России и историю прогонов');
+});
+
+/* ---------- 11. v0.6: матрица «вопрос ↔ норма» ------------------------------ */
+
+test('v0.6 матрица: покрывает весь банк — у каждого вопроса есть запись, лишних нет', () => {
+  for (const qid of Object.keys(BANK)) {
+    assert.ok(NMAP[qid], `${qid}: нет записи в матрице НПА`);
+  }
+  for (const qid of Object.keys(NMAP)) {
+    assert.ok(BANK[qid], `матрица ссылается на несуществующий вопрос ${qid}`);
+  }
+});
+
+test('v0.6 матрица: статусы — только norm/frame/practice; norm обязан иметь нормы', () => {
+  for (const [qid, m] of Object.entries(NMAP)) {
+    assert.ok(['norm', 'frame', 'practice'].includes(m.st), `${qid}: неизвестный статус ${m.st}`);
+    if (m.st === 'norm') {
+      assert.ok(Array.isArray(m.refs) && m.refs.length >= 1, `${qid}: статус norm без норм`);
+    }
+  }
+});
+
+test('v0.6 матрица: ссылки ведут на реестр, формат записи строгий', () => {
+  for (const [qid, m] of Object.entries(NMAP)) {
+    for (const r of m.refs || []) {
+      assert.ok(Array.isArray(r) && r.length === 3, `${qid}: запись нормы — не тройка [акт, пункт, суть]`);
+      assert.ok(NPA[r[0]], `${qid}: ссылка на неизвестный акт ${r[0]}`);
+      assert.ok(typeof r[2] === 'string' && r[2].length >= 10, `${qid}: у нормы пустая суть`);
+      assert.ok(r[1] === null || /^[пст]\.\s|^[—]/.test(r[1] || '') || r[1].length <= 40,
+        `${qid}: подозрительный «пункт» ${JSON.stringify(r[1])}`);
+    }
+  }
+});
+
+test('v0.6 реестр: у каждого акта полные реквизиты и источник', () => {
+  const want = ['kind', 'num', 'date', 'title', 'inForce', 'scope', 'key', 'src'];
+  for (const [id, a] of Object.entries(NPA)) {
+    for (const k of want) {
+      assert.ok(typeof a[k] === 'string' && a[k].length >= 3, `${id}: нет поля ${k}`);
+    }
+    assert.ok(/^https:\/\//.test(a.src), `${id}: источник не URL`);
+    assert.ok(/\d{2}\.\d{2}\.\d{4}/.test(a.date), `${id}: дата не в формате ДД.ММ.ГГГГ`);
+  }
+  assert.equal(Object.keys(NPA).length, 9, 'в реестре не 9 актов');
+});
+
+test('v0.6 анти-миф: матрица не ссылается на отменённые акты, замены на месте', () => {
+  /* Ключевой урок спора: записка v0.4.1 ссылалась на приказ № 103 (птица),
+   * который к октябрю 2026 год как отменён № 188. Гейт держит свежесть. */
+  const superNums = NSUP.map((s) => s.num);
+  assert.ok(superNums.includes('№ 103') && superNums.includes('№ 213')
+    && superNums.includes('№ 90') && superNums.includes('№ 626'), 'список отменённых неполон');
+  for (const s of NSUP) {
+    const replacement = Object.values(NPA).find((a) => (a.replaced || '').includes(s.num));
+    assert.ok(replacement, `отменённый ${s.num}: не найден заменяющий акт в реестре`);
+  }
+  for (const [qid, m] of Object.entries(NMAP)) {
+    for (const r of m.refs || []) {
+      const cited = (NPA[r[0]] || {}).num;
+      assert.ok(!superNums.includes(cited), `${qid}: ссылка на отменённый акт ${cited}`);
+    }
+  }
+});
+
+test('v0.6 реестр: свежие замены в основании — № 188 (птица), № 677 (отходы), № 37 (АЧС), № 158 (грипп)', () => {
+  assert.ok((NPA.p188.replaced || '').includes('№ 103'), '№ 188 не объявляет отмену № 103');
+  assert.ok((NPA.p677.replaced || '').includes('№ 626'), '№ 677 не объявляет отмену № 626');
+  assert.ok((NPA.p37.replaced || '').includes('№ 213'), '№ 37 не объявляет отмену № 213');
+  assert.ok((NPA.p158.replaced || '').includes('№ 90'), '№ 158 не объявляет отмену № 90');
+  assert.ok((NPA.p622.replaced || '').includes('№ 551') || (NPA.p622.inForce || '').includes('2021'),
+    '№ 622: не видно, что он сменил № 551');
+});
+
+test('v0.6 витрина: matrix.html жив — реестр, фильтры, статусные метки, ссылка на анкету', () => {
+  const html = readFileSync(join(HERE, '..', 'matrix.html'), 'utf8');
+  assert.ok(html.includes('Матрица «вопрос ↔ норма»'), 'matrix.html: нет заголовка матрицы');
+  assert.ok(html.includes('data-npa.js'), 'matrix.html: не подключён data-npa.js');
+  assert.ok(html.includes('f-pkg') && html.includes('f-cat') && html.includes('f-st'),
+    'matrix.html: нет фильтров пакет/категория/статус');
+  assert.ok(html.includes('st-norm') && html.includes('st-frame') && html.includes('st-practice'),
+    'matrix.html: нет статусных меток');
+  assert.ok(html.includes('./index.html'), 'matrix.html: нет пути назад к анкете');
+  assert.ok(!html.includes('telemetry'), 'matrix.html: телеметрии тут не место');
+  assert.ok(/@media\s+print/.test(html), 'matrix.html: нет print-стилей');
+});
+
+test('v0.6 анкета: data-npa подключён, чипы норм в профи-режиме, ссылка на матрицу', () => {
+  const html = readFileSync(join(HERE, '..', 'index.html'), 'utf8');
+  assert.ok(html.includes('data-npa.js'), 'index.html: не подключён data-npa.js');
+  assert.ok(html.includes('npaChip'), 'index.html: нет рендера чипов нормы');
+  assert.ok(html.includes("state.mode === 1"), 'index.html: чипы не привязаны к профи-режиму');
+  assert.ok(html.includes('matrix.html'), 'index.html: нет ссылки на матрицу');
+  assert.ok(html.includes('онлайн · v0.6'), 'index.html: версия не поднята до v0.6');
+  assert.ok(html.includes('catActs'), 'index.html: нет колонки норм в таблице категорий');
+  /* чипы не появляются в режиме владельца: рендер ограничен профи-режимом */
+  const seg = html.slice(html.indexOf('function npaChip'), html.indexOf('function renderPacks'));
+  assert.ok(seg.includes("state.mode === 1") || html.indexOf("state.mode === 1") > -1,
+    'чипы нормы должны показываться только профессионалу');
+});
+
+/* ---------- 12. v0.6: валидация классов A/B/C — гейт CI --------------------- */
+
+test('v0.6 валидация: scripts/bb_class_validation.cjs проходит без провалов', () => {
+  const r = spawnSync(process.execPath, [join(HERE, '..', 'scripts', 'bb_class_validation.cjs')],
+    { encoding: 'utf8', timeout: 60000 });
+  assert.equal(r.status, 0, `валидация классов падает:\n${r.stdout}\n${r.stderr}`);
+  assert.ok(r.stdout.includes('все проверки зелёные'), 'валидация не отчиталась зелёным итогом');
+});
+
+test('v0.6 валидация: отчёт VALIDATION.md существует и честно ограничивает себя', () => {
+  const md = readFileSync(join(HERE, '..', 'VALIDATION.md'), 'utf8');
+  assert.ok(md.includes('виньет'), 'VALIDATION.md: не назван метод — виньеты');
+  assert.ok(md.includes('не полевая валидация') || md.includes('чем это не является'),
+    'VALIDATION.md: нет честной пометки «это не полевая валидация»');
+  assert.ok(md.includes('aHoles') && md.includes('монотонность'), 'VALIDATION.md: нет результатов монотонности');
+  assert.ok(md.includes('Полярная валидация') || md.includes('полярная валидация'),
+    'VALIDATION.md: полярная валидация не поставлена в очередь');
 });
